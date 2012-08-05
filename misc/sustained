@@ -12,7 +12,6 @@ file
 findutils
 gawk
 gcc
-gettext
 glib-2
 glibc
 gmp
