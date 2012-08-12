@@ -167,7 +167,7 @@ lrm_module() {
   # grep -v the install logs over the protected stuff, this
   # yields the files that may be removed
   if [ "$REAP" == "on" ] ; then
-    cat "$INST_LOG" | grep -v -f "$PROTECTED" | while read TARGET ; do
+    grep -v -f "$PROTECTED" "$INST_LOG" | while read TARGET ; do
       if [ -e "$TARGET" ] || [ -L "$TARGET" ]; then
         if [ -d "$TARGET" ] ; then
           echo "$TARGET" >> $TMP_DIRS

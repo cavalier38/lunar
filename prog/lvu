@@ -437,7 +437,7 @@ show_conflicts()  {
   TMP_CONFLICTS2=$(temp_create "conflicts")
   for MODULE in $(list_installed); do
     VERSION=$(installed_version $MODULE)
-    cat "$INSTALL_LOGS/$MODULE-$VERSION" | grep "/bin/\|/games/\|/include/\|/lib/\|/sbin/" |
+    grep "/bin/\|/games/\|/include/\|/lib/\|/sbin/" "$INSTALL_LOGS/$MODULE-$VERSION" |
     grep -v "/doc/\|/etc/\|/fonts/\|/man/\|/var/\|/lib/modules\|/site-packages/\|/lib/perl5" |
     while read LINE; do
         [ ! -d "$LINE" ] && echo "${MODULE} ${LINE}" >> $TMP_CONFLICTS

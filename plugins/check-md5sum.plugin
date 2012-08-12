@@ -28,7 +28,7 @@ plugin_module_check_md5sum()  {
   if [ -e "$MD5_LOG" ]; then
     export IFS=$'\t\n'
 
-    cat "$MD5_LOG" | grep "/bin/\|/games/\|/include/\|/lib/\|/sbin/" |
+    grep "/bin/\|/games/\|/include/\|/lib/\|/sbin/" "$MD5_LOG" |
             grep -v "/doc/\|/etc/\|/fonts/\|/man/\|/var/" |
             while read LINE ; do
       if ! echo $LINE | md5sum --check --status ; then

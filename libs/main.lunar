@@ -156,9 +156,9 @@ expand_cache_safe() {(
     echo "$TARGET" >> $TMP_TARGETS_OK
   done
   # do files - bulk process the normal ones
-  cat "$TMP_TARGETS" | grep -v -f "$EXCLUDED" >> $TMP_TARGETS_OK
+  grep -v -f "$EXCLUDED" "$TMP_TARGETS" >> $TMP_TARGETS_OK
   # now double check the EXCLUDED ones
-  for TARGET in $(cat "$TMP_TARGETS" | grep -f "$EXCLUDED" ) ; do
+  for TARGET in $(grep -f "$EXCLUDED" "$TMP_TARGETS" ) ; do
     if [ -e "$TARGET" ] ; then
       debug_msg "Cowardishly not overwriting \"$TARGET\""
     else

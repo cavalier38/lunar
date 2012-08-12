@@ -111,7 +111,7 @@ sort_by_dependency() {
   done
 
   # now reverse grep over the files:
-  cat "$TMP_ALL" | grep -x -f "$TMP_LIST"
+  grep -x -f "$TMP_LIST" "$TMP_ALL"
   
   temp_destroy $TMP_LIST
   temp_destroy $TMP_ALL
