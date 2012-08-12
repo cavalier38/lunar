@@ -98,8 +98,8 @@ get_data () {
 
   # VITAL INFO: SERVPID
   if [ -f "$PIDFILE" ] ; then
-    if [ -d "/proc/$(cat $PIDFILE)" ] ; then
-      SERVPID=$(cat "$PIDFILE")
+    if [ -d "/proc/$(< $PIDFILE)" ] ; then
+      SERVPID=$(< "$PIDFILE")
     fi
   fi
 }
@@ -125,7 +125,7 @@ pgrep () {
   else
     # where is the new daemon???
     if [ -f "$PIDFILE" ] ; then
-      if [ -d "/proc/$(cat $PIDFILE)" ] ; then
+      if [ -d "/proc/$(< $PIDFILE)" ] ; then
         return 0
       else
         return 255
@@ -134,7 +134,7 @@ pgrep () {
       # sleep 1
       # second chance:
       if [ -f "$PIDFILE" ] ; then
-        if [ -d "/proc/$(cat $PIDFILE)" ] ; then
+        if [ -d "/proc/$(< $PIDFILE)" ] ; then
           return 0
         else
           return 255

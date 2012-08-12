@@ -109,7 +109,7 @@ rebuild()  {
     edit_file $TMP_QUEUE
   fi
 
-  QUEUE=$(cat "$TMP_QUEUE")
+  QUEUE=$(< "$TMP_QUEUE")
   temp_destroy $TMP_QUEUE
 
   if [ -n "$QUEUE" ] ; then

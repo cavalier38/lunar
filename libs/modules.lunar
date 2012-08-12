@@ -765,7 +765,7 @@ update_modules() {
   if query "Do you wish to edit the update queue ? " n ; then
     edit_file $TMP_QUEUE
   fi
-  QUEUE=$(cat "$TMP_QUEUE")
+  QUEUE=$(< "$TMP_QUEUE")
   temp_destroy $TMP_QUEUE
 
   if [ -n "$QUEUE" ] ; then

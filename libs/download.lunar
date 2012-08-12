@@ -19,7 +19,7 @@ lget_lock() {
 lget_locked() {
 	debug_msg "lget_locked ($@)"
 	if [ -f "/var/lock/lgetting.$MODULE" ] &&
-			ps `cat "/var/lock/lgetting.$MODULE"` | grep	-q	"lget" ; then
+			ps `< "/var/lock/lgetting.$MODULE"` | grep	-q	"lget" ; then
 		true
 	else
 		false

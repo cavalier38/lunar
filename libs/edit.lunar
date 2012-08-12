@@ -47,7 +47,7 @@ patch_it () {
 
   if $GZCMD "$PATCH" > $TMPFILE1 ; then
     # uncompress OK
-    if cat "$TMPFILE1" | $TARCMD > $TMPFILE2 ; then
+    if < "$TMPFILE1" $TARCMD > $TMPFILE2 ; then
       # untar OK
       if patch -N -p$2 < $TMPFILE2 ; then
         # patch cmd is OK

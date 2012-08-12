@@ -141,7 +141,7 @@ import_snapshot()  {
 	message "${MESSAGE_COLOR}Restoring lunar configuration${DEFAULT_COLOR}"
     cp -a etc/lunar /etc
 
-    for LINE in $(cat ".$MODULE_STATUS") ; do
+    for LINE in $(< ".$MODULE_STATUS") ; do
       LIST="$LIST $(echo $LINE | cut -d: -f1)"
     done
     verbose_msg "Sorting update queue"
@@ -158,7 +158,7 @@ import_snapshot()  {
       edit_file $TMP_QUEUE
     fi
 
-    QUEUE=$(cat "$TMP_QUEUE")
+    QUEUE=$(< "$TMP_QUEUE")
     temp_destroy $TMP_QUEUE
 
     if [ -n "$QUEUE" ] ; then
@@ -176,14 +176,14 @@ import_snapshot()  {
 
 
 checksum() {
-  for FILE in $(cat "$1" | files) ; do
+  for FILE in $(files < "$1") ; do
     sum -s "$FILE"
   done
 }
 
 
 md5sum_files() {
-  for FILE in $(cat "$1" | files) ; do
+  for FILE in $(files < "$1") ; do
     md5sum "$FILE"
   done
 }
@@ -328,7 +328,7 @@ older()  {
   if [ ! -z "$1" ] ; then
     if [ -z `echo $1 | sed 's/[[:digit:]]//g'` ] ; then
       if [ "$1" -gt "20010101" -a "$1" -lt "20310101" ] ; then
-        for LINE in $(cat "$MODULE_STATUS") ; do
+        for LINE in $(< "$MODULE_STATUS") ; do
           LIN_DATE=$(echo $LINE | cut -d: -f2)
           if [ "$LIN_DATE" -gt "$1" ] 2>/dev/null ; then
             true
@@ -354,7 +354,7 @@ show_module_component()  {
 
 find_active_lin()  {
   for FILE in $(ls /var/lock/installing.* 2>/dev/null) ; do
-    if [ -d /proc/$(cat "$FILE") ] ; then
+    if [ -d /proc/$(< "$FILE") ] ; then
       echo $FILE | sed "s:/var/lock/installing.::"
       return  0
     fi
@@ -364,9 +364,9 @@ find_active_lin()  {
 
 
 follow_active_lin()  {
-  if [ -f /var/lock/installing.$1 -a -d /proc/$(cat "/var/lock/installing.$1") ] ; then
-    if  [ -f $TMPDIR/lunar.lin.$(cat "/var/lock/installing.$1").$1.compile-log.* ] ; then
-      tail -f $TMPDIR/lunar.lin.$(cat "/var/lock/installing.$1").$1.compile-log.* --follow=name --pid=$(cat "/var/lock/installing.$1")  2>/dev/null
+  if [ -f /var/lock/installing.$1 -a -d /proc/$(< "/var/lock/installing.$1") ] ; then
+    if  [ -f $TMPDIR/lunar.lin.$(< "/var/lock/installing.$1").$1.compile-log.* ] ; then
+      tail -f $TMPDIR/lunar.lin.$(< "/var/lock/installing.$1").$1.compile-log.* --follow=name --pid=$(< "/var/lock/installing.$1")  2>/dev/null
     fi
   fi
 }
@@ -865,7 +865,7 @@ show_info() {
         echo "`sed "s:\t: :g" "$MOONBASE/$SECTION/$MODULE/services" | sed 's:^:    :g'`"
       else
         echo -n ": "
-        echo "`cat "$MOONBASE/$SECTION/$MODULE/services"`"
+        echo "`< "$MOONBASE/$SECTION/$MODULE/services"`"
       fi
     fi
 
@@ -1019,7 +1019,7 @@ submit_module() {
       echo 'module:' $1
       echo "id: $UNIQID"
       echo "lvu submit: $1"
-      echo "lvu: $(cat /bin/lvu | md5sum)"
+      echo "lvu: $(md5sum < /bin/lvu)"
       echo "uname -r: $(uname -r)"
       echo "kernel headers: $(installed_version kernel-headers)"
       echo "gcc: $(installed_version gcc)"
@@ -1452,7 +1452,7 @@ main()  {
       ;;
 
     service)
-      cat "$MODULE_INDEX" | while read ENTRY ; do
+      < "$MODULE_INDEX" while read ENTRY ; do
         MOD=$(echo "$ENTRY" | cut -d: -f1)
         SEC=$(echo "$ENTRY" | cut -d: -f2)
         if [ -f $MOONBASE/$SEC/$MOD/services ] ; then
@@ -1566,7 +1566,7 @@ main()  {
            echo "Install log for $2 does not exist"
            return 1
          else
-           cat "$INSTALL_LOGS/$2-$(installed_version $2)" | while read LINE ; do
+           < "$INSTALL_LOGS/$2-$(installed_version $2)" while read LINE ; do
              if file $LINE | grep -q "ELF " ; then
                echo -n "$LINE "
                strings -a "$LINE" | grep GCC: | sort -r | head -n 1

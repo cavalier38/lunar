@@ -713,14 +713,14 @@ goodbye() {
 background_execute() {
   $DIALOG  --msgbox  "Processing queues in the background."  0 0
 
-  [  -f         $REMOVE_QUEUE  ]  &&
-  lrm  `cat  "$REMOVE_QUEUE"`   1>/dev/null 2>&1
-  rm  -f        $REMOVE_QUEUE
+  [  -f    $REMOVE_QUEUE  ]  &&
+  lrm  `< "$REMOVE_QUEUE"`   1>/dev/null 2>&1
+  rm  -f   $REMOVE_QUEUE
 
-  if  [  -f            $INSTALL_QUEUE  ];  then
-    lin  --deps  `cat "$INSTALL_QUEUE"`
-    (  lin       `cat "$INSTALL_QUEUE"` 1>/dev/null 2>&1  &&
-         rm -f         $INSTALL_QUEUE
+  if  [  -f          $INSTALL_QUEUE  ];  then
+    lin  --deps  `< "$INSTALL_QUEUE"`
+    (  lin       `< "$INSTALL_QUEUE"` 1>/dev/null 2>&1  &&
+         rm -f       $INSTALL_QUEUE
     )  &
   fi
 
@@ -729,10 +729,10 @@ background_execute() {
 
 
 foreground_execute() {
-  [ -f $REMOVE_QUEUE ] && lrm `cat "$REMOVE_QUEUE"`
+  [ -f $REMOVE_QUEUE ] && lrm `< "$REMOVE_QUEUE"`
   rm -f $REMOVE_QUEUE
 
-  [ -f $INSTALL_QUEUE ] && lin `cat "$INSTALL_QUEUE"`
+  [ -f $INSTALL_QUEUE ] && lin `< "$INSTALL_QUEUE"`
   rm  -f $INSTALL_QUEUE
 
   goodbye
