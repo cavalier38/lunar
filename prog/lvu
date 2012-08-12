@@ -1164,7 +1164,7 @@ EOFDETA
            SHORT="$SHORT"
 cat <<EOF
 EOFDETB
-		cat "$LONG" | fmt -72
+		fmt -72 "$LONG"
 		echo "EOF"
 	) > $MOONBASE/zlocal/$1/DETAILS
 
