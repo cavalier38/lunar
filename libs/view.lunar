@@ -21,7 +21,7 @@ view_file()  {
              cat "$1" | ${PAGER:-less} ;;
     esac
   else
-    cat - | ${PAGER:-less}
+    ${PAGER:-less}
   fi
 }
 
