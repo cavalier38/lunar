@@ -932,12 +932,12 @@ diff_module() {
     SECTION=zbeta
     echo diff /dev/null b/zbeta/$MODULE
     diff -Nur /var/empty $MOONBASE/zlocal/$ZSECTION/$MODULE --exclude ".svn" --exclude "CVS" | \
-    grep -v ^diff | sed "s:/var/empty/:a/zbeta/$MODULE/:g;s:$MOONBASE/zlocal/$ZSECTION/:b/zbeta/:g"
+    sed "/^diff/d;s:/var/empty/:a/zbeta/$MODULE/:g;s:$MOONBASE/zlocal/$ZSECTION/:b/zbeta/:g"
   else
     # modified module
     echo diff a/$NZSECTION/$MODULE b/$NZSECTION/$MODULE
     diff -Nur $MOONBASE/$NZSECTION/$MODULE $MOONBASE/zlocal/$ZSECTION/$MODULE --exclude ".svn" --exclude "CVS" | \
-    grep -v ^diff | sed "s:$MOONBASE/$NZSECTION/:a/$NZSECTION/:g;s:$MOONBASE/zlocal/$ZSECTION/:b/$NZSECTION/:g"
+    sed "/^diff/d;s:$MOONBASE/$NZSECTION/:a/$NZSECTION/:g;s:$MOONBASE/zlocal/$ZSECTION/:b/$NZSECTION/:g"
   fi
 }
 
