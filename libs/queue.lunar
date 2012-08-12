@@ -56,7 +56,7 @@ remove_queue() {
       rm -f $TMP_QUEUE 2>/dev/null
       lock_file $1                 &&
       cat "$1" | grep -v "^"$2"\$" > $TMP_QUEUE
-      cat "$TMP_QUEUE" > $1
+      cp "$TMP_QUEUE" $1
       unlock_file $1 
       rm -f $TMP_QUEUE 2>/dev/null 
    else

@@ -54,7 +54,7 @@ ld_remove() {
 			verbose_msg "Removing $1 from ld.so.conf"
 
 			grep -v "$1" /etc/ld.so.conf > $TMP_LD_CONF
-			cat "$TMP_LD_CONF" > /etc/ld.so.conf
+			cp "$TMP_LD_CONF" /etc/ld.so.conf
 			ldconfig
 
 			temp_destroy $TMP_LD_CONF
