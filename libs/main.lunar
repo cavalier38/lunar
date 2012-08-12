@@ -140,7 +140,7 @@ expand_cache_safe() {(
   # do directories: we don't care here
   # the sed trick is advanced: a non-greedy pattern that returns all
   # directory names listed in the input
-  for TARGET in $(cat "$TMP_TARGETS" | sed 's/\/[^\/]*$/\//g' ) ; do
+  for TARGET in $(sed 's/\/[^\/]*$/\//g' "$TMP_TARGETS" ) ; do
     if [ ! -d $TARGET ]; then
       debug_msg "mkdir -p $TARGET"
       mkdir -p $TARGET

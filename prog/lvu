@@ -862,7 +862,7 @@ show_info() {
       echo -n "  Provides Service"
       if [ 1 -lt $LINES ]; then
         echo "s:"
-        echo "`cat "$MOONBASE/$SECTION/$MODULE/services" | sed "s:\t: :g" | sed 's:^:    :g'`"
+        echo "`sed "s:\t: :g" "$MOONBASE/$SECTION/$MODULE/services" | sed 's:^:    :g'`"
       else
         echo -n ": "
         echo "`cat "$MOONBASE/$SECTION/$MODULE/services"`"

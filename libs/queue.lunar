@@ -61,8 +61,8 @@ remove_queue() {
       rm -f $TMP_QUEUE 2>/dev/null 
    else
       lock_file $1                 && 
-      echo `cat "$1" | sed 1!d`      &&
-      cat "$1" | sed "1d" > $1       &&
+      echo `sed 1!d "$1"`          &&
+      sed "1d" -i "$1"             &&
       unlock_file $1
   fi
 }
