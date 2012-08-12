@@ -126,7 +126,7 @@ process_directories() {
     return 1
   fi
 
-  cat "$1" | sort -r | while read LINE ; do
+  sort -r "$1" | while read LINE ; do
     remove_something "$LINE"
   done
 }
