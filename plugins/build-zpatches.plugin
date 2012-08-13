@@ -50,7 +50,7 @@ plugin_zpatches_apply()
 
       if $GZCMD "$FPATCH" > $TMPFILE1 ; then
         # uncompress OK
-        if < "$TMPFILE1" $TARCMD > $TMPFILE2 ; then
+        if $TARCMD < "$TMPFILE1" > $TMPFILE2 ; then
           # untar OK
           # Trying -p1 first or else we try -p0
           # An error will be visible if -p1 fail which is normal
