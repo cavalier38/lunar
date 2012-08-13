@@ -119,11 +119,11 @@ download_module() {
 
 				# scan for hits against known clusters of mirrors
 				for MLIST in $MIRRORS/*; do
-					for ALT in $(sed 's/.*\t\([^\t]*\)$/\1/g' "$MLIST" | grep -v "^Custom$"); do
+					for ALT in $(sed 's/.*\t\([^\t]*\)$/\1/g;/^Custom$/d' "$MLIST"); do
 						if [ "${URL:0:${#ALT}}" == "$ALT" ] ; then
 							# compose the list of valid mirrors
 							REST=${URL:${#ALT}}
-							for HIT in $(sed 's/.*\t\([^\t]*\)$/\1/g' "$MLIST"); do
+							for HIT in $(sed 's/.*\t\([^\t]*\)$/\1/g;/^Custom$/d' "$MLIST"); do
 								add_url ${HIT}${REST}
 							done
 						fi
