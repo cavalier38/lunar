@@ -31,8 +31,8 @@ create_uniq_id() {
   fi
 
   IFACE=$(ip route | awk '/^default/ {print $5}')
-  UNIQID=$(ip addr show $IFACE | awk '/link\/ether/ {print $2}' |\
-      tr 'A-Z' 'a-z' | md5sum | awk '{print $1}')
+  UNIQID=$(ip addr show $IFACE | awk '/link\/ether/ {print tolower($2)}' |\
+      md5sum | awk '{print $1}')
 
   export UNIQID
 
