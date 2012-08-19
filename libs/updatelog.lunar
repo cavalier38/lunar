@@ -71,7 +71,7 @@ display_moonbase_changes()  {
     MODULE_CHANGES=$(temp_create "module-changes")
     diff -U0 $TMP_MODULE_INDEX $MODULE_INDEX | grep -v -e '^@@' -e '^---' -e '^+++' > $MODULE_CHANGES
 
-    MODULES=$(cut -d: -f1 "$MODULE_CHANGES"  | sed 's:^[+-]::' | sort -t : | uniq)
+    MODULES=$(cut -d: -f1 "$MODULE_CHANGES"  | sed 's:^[+-]::' | sort -u -t :)
 	for M in $MODULES; do
 	  IN=$(grep "^-$M:" "$MODULE_CHANGES")
 	  OUT=$(grep "^+$M:" "$MODULE_CHANGES")

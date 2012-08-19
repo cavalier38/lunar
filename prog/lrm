@@ -347,7 +347,7 @@ else
     if check_status "$MODULE" ; then
       # assemble purge list if requested
       if [ "$PURGE" == "on" ] ; then
-        DEPS=$(list_installed_depending "$MODULE" | sort | uniq)
+        DEPS=$(list_installed_depending "$MODULE" | sort -u)
         for DEP in $DEPS ; do
           # skip held modules
           if ! module_held $DEP ; then

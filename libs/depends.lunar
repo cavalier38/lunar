@@ -545,7 +545,7 @@ list_installed_depending() {
   debug_msg "list_installed_depending($2)"
   for SUBDEP in $(grep ":$1:" "$DEPENDS_CACHE" | cut -d: -f1) ; do
     if $(module_installed $SUBDEP ) ; then
-      list_installed_depending $SUBDEP | sort | uniq
+      list_installed_depending $SUBDEP | sort -u
       echo $SUBDEP
     fi
   done

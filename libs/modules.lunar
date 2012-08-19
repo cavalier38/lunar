@@ -32,8 +32,8 @@
 list_sections() {
 	debug_msg "list_sections ($@)"
 	check_module_index
-	cut -d: -f2 "$MODULE_INDEX" | sort | uniq
-	find $MOONBASE/zlocal -name DETAILS | sed "s:^$MOONBASE\/::g;s:\/[^\/]*\/DETAILS$::g" | sort | uniq
+	cut -d: -f2 "$MODULE_INDEX" | sort -u
+	find $MOONBASE/zlocal -name DETAILS | sed "s:^$MOONBASE\/::g;s:\/[^\/]*\/DETAILS$::g" | sort -u
 	return 0
 }
 

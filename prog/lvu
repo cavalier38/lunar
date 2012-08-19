@@ -198,10 +198,10 @@ alien() {
   TMP_KNOWN=$(temp_create "lvu.known")
 
   message  "Discovering ambient files..." 1>&2
-  find $TRACKED | files | grep -v -f "$EXCLUDED" | grep -v -f "$PROTECTED" | sort | uniq > $TMP_FOUND
+  find $TRACKED | files | grep -v -f "$EXCLUDED" | grep -v -f "$PROTECTED" | sort -u > $TMP_FOUND
   message  "Discovering installed files..." 1>&2
   ( cat $INSTALL_LOGS/* ; ls $INSTALL_CACHE/* ; ls $SOURCE_CACHE/*
-  )| files | sort | uniq > $TMP_KNOWN
+  )| files | sort -u > $TMP_KNOWN
 
   diff -B -a -d $TMP_FOUND $TMP_KNOWN | grep -e "^< " | cut -c 3-
 
@@ -509,7 +509,7 @@ moonalyze() {
   sort_uniq() {
     for i in $@; do
       echo $i
-    done | sort | uniq
+    done | sort -u
   }
 
   run_depends() {
@@ -661,7 +661,7 @@ function show_tree() {
   # gather dependencies, sorted by 1) required, 2) optional, and
   # alphabetically too
   unset ALL
-  DEPS=$(run_depends $1 | sort | uniq)
+  DEPS=$(run_depends $1 | sort -u)
   for DEP in $DEPS ; do
     if [ ${DEP:0:1} == "+" ] ; then
       ALL="$DEP $ALL"
@@ -759,7 +759,7 @@ show_eert() {
 
   show_rtree() {
     # we need to do an reverse tree for $1
-    RDEPS=$(grep ":$1:" "$DEPENDS" | cut -d: -f1 | sort | uniq)
+    RDEPS=$(grep ":$1:" "$DEPENDS" | cut -d: -f1 | sort -u)
 
     if module_installed $1 ; then
       STR="${INDENT}^----${MODULE_COLOR}$1${DEFAULT_COLOR}: "
@@ -1223,7 +1223,7 @@ main()  {
       ;;
 
     leafs)
-      show_leafs | sort | uniq
+      show_leafs | sort -u
       ;;
 
     orphans)
@@ -1462,7 +1462,7 @@ main()  {
       ;;
 
     depends)
-      show_depends "$2" | sort | uniq
+      show_depends "$2" | sort -u
       ;;
 
     website)
@@ -1580,7 +1580,7 @@ main()  {
    links)
      [[ -z "$2" ]] && return 1
 
-     REGEX=$(lvu install $2 | xargs -d '\n' file | awk -F: '/ELF/ { print $1 }' | xargs -d '\n' ldd | fgrep '=>' | cut -d' ' -f3 | sort | uniq)
+     REGEX=$(lvu install $2 | xargs -d '\n' file | awk -F: '/ELF/ { print $1 }' | xargs -d '\n' ldd | fgrep '=>' | cut -d' ' -f3 | sort -u)
 
      pushd $INSTALL_LOGS >/dev/null
      fgrep -xl "$REGEX" *
