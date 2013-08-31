@@ -92,6 +92,61 @@ release_saved_libraries()  {
 }
 
 
+save_config()  {
+  local OLD_VERSION OLD_LOG OLD_ETC SAVED LINE FILE
+  debug_msg "save_config ($@)"
+
+  OLD_VERSION=`installed_version  $MODULE`
+  OLD_LOG=$MD5SUM_LOGS/$MODULE-$OLD_VERSION
+
+  [ -e "$OLD_LOG" ] || return 0
+
+  OLD_ETC=$SOURCE_DIRECTORY/old.etc
+  mkdir  -p  $OLD_ETC
+
+  SAVED=$OLD_ETC/$MODULE.saved.etc
+  rm  -rf  $SAVED
+
+  grep   "^/etc/"  "$OLD_LOG"  |
+  while  read  LINE;  do
+
+    if [ -f "$LINE"  ]
+    then
+      FILE="${LINE#*  }"
+      verbose_msg "saving config \"$FILE\""
+      mkdir -p "$(dirname "$OLD_ETC/${FILE#/etc/}")"
+      mv  "$FILE"  "$OLD_ETC/${FILE#/etc/}"
+      echo  "$LINE"  >>  $SAVED
+    fi
+  done
+}
+
+
+release_saved_config()  {
+  local OLD_ETC SAVED LINE FILE
+  debug_msg "release_saved_config ($@)"
+  OLD_ETC=$SOURCE_DIRECTORY/old.etc
+  SAVED=$OLD_ETC/$MODULE.saved.etc
+
+  if [ -f $SAVED ] ; then
+    while read LINE ; do
+      FILE="${LINE#*  }"
+      if [ "$(md5sum "$FILE" | cut -d' ' -f1)" != "${LINE%%  *}" ]
+      then
+	verbose_msg "releasing config \"$FILE\""
+	if [ "$(md5sum "$FILE")" != "$LINE" ]
+	then
+	  mv  "$FILE"  "$FILE.linnew"
+	fi
+	mv  "$OLD_ETC/${FILE#/etc/}"  "$FILE"
+      else
+	mv -f  "$OLD_ETC/${FILE#/etc/}"
+      fi
+    done < $SAVED
+  fi
+}
+
+
 export_ld()  {
   local DIRECTORY
   debug_msg "export_ld ($@)"
@@ -113,6 +168,7 @@ prepare_install() {
     message  "${MESSAGE_COLOR}Preparing to install"  \
              "${MODULE_COLOR}${MODULE}${DEFAULT_COLOR}"
     save_libraries
+    save_config
     verbose_msg "calling \"lrm --upgrade $MODULE\""
     lrm --upgrade $MODULE
     true
@@ -324,6 +380,7 @@ default_post_build() {
 
   ldconfig
   release_saved_libraries
+  release_saved_config
   cd /
 }
 
