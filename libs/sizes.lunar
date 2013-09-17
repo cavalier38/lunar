@@ -27,7 +27,7 @@ find_module_size() {
       local SIZE
       unset SIZE
       [ -e "$MODULE_STATUS" ] &&
-      SIZE=$(sed -n "s/^$1:.*://p" "$MODULE_STATUS")
+      SIZE=$(sed -n "s/^$1:.*://p;T;q" "$MODULE_STATUS")
       [ -n "$SIZE" ] && echo ${SIZE} || false
    }
 

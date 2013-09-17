@@ -36,7 +36,7 @@ unalias() {
     fi
   fi
 
-  TARGETS=$(sed -n "s/^$1://p" "$ALIASES")
+  TARGETS=$(sed -n "s/^$1://p;T;q" "$ALIASES")
 
   # shortcut out when explicitly instructed so
   if [[ -n "$NEVER_ASK" ]] ; then
