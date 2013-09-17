@@ -50,7 +50,7 @@ rebuild_status_files() {
         ((COUNTS++))
         VERSION=$(echo $MODULE_NAME | cut -d "-" -f "$COUNTS"-)
         SIZE=$(find_module_size $REAL_NAME $VERSION)
-        DATE=$(ls -l $INSTALL_LOGS/$REAL_NAME-$VERSION --time-style=+%Y%m%d | awk '{print $6}')
+        DATE=$(date -r $INSTALL_LOGS/$REAL_NAME-$VERSION +%Y%m%d)
         # adjusted add_module code that echos the DATE field ;^)
         lock_file $MODULE_STATUS &&
         lock_file $MODULE_STATUS_BACKUP &&
