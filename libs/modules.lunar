@@ -183,7 +183,7 @@ find_section() {
 	fi
 
 	# otherwise check for ordinary modules named that way
-	SECTION=$(awk -F: "(\$1==\"$1\"){print \$2;exit 0}" "$MODULE_INDEX")
+	SECTION=$(sed -n "s/^$1://p" "$MODULE_INDEX")
 	if [[ -n "$SECTION" ]] && [[ -d "$MOONBASE/$SECTION/$1" ]] ; then
 		echo "$SECTION"
 		return 0
@@ -206,7 +206,7 @@ find_section() {
 	fi
 
 	# and search again, this should be quick now
-	SECTION=$(awk -F: "(\$1==\"$1\"){print \$2;exit 0}" "$MODULE_INDEX")
+	SECTION=$(sed -n "s/^$1://p" "$MODULE_INDEX")
 	if [[ -n "$SECTION" ]] && [[ -d "$MOONBASE/$SECTION/$1" ]] ; then
 		echo "$SECTION"
 		return 0

@@ -1580,7 +1580,7 @@ main()  {
    links)
      [[ -z "$2" ]] && return 1
 
-     REGEX=$(lvu install $2 | xargs -d '\n' file | awk -F: '/ELF/ { print $1 }' | xargs -d '\n' ldd | fgrep '=>' | cut -d' ' -f3 | sort -u)
+     REGEX=$(lvu install $2 | xargs -d '\n' file | sed -n '/\<ELF\>/s/:.*$//p' | xargs -d '\n' ldd | fgrep '=>' | cut -d' ' -f3 | sort -u)
 
      pushd $INSTALL_LOGS >/dev/null
      fgrep -xl "$REGEX" *

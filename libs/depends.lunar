@@ -57,7 +57,7 @@ function find_depends() {
         DEPS=$(MODULE=$1 . $DEPFILE)
       fi
     else
-      DEPS=$(awk -F: -v mod=$1 '{if ($1==mod){print $2}}' "$DEPENDS_CACHE")
+      DEPS=$(sed -n "s/^$1:\\([^:]*\\):.*$/\\1/p" "$DEPENDS_CACHE")
     fi
     for DEP in $DEPS ; do
       DEP=$(unalias "$DEP")
