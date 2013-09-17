@@ -94,7 +94,7 @@ sort_by_dependency() {
 
   # tsort the existing dep relations in all of moonbase
   TMP_TSRT=$(temp_create "dependency.sort")
-  awk -F: '{print $1,$2}' "$DEPENDS_CACHE" | while read A B ; do
+  cut -d: -f1,2 --output-delimiter=' ' "$DEPENDS_CACHE" | while read A B ; do
     B=$(MODULE=$A NEVER_ASK=1 DEPS_ONLY= unalias $B)
     echo "$A $B" >> $TMP_TSRT
   done

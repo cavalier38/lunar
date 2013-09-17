@@ -116,12 +116,12 @@ main() {
       for M in $LIST $MODULES; do
           THIS_TEMP=$(temp_create "$M.download.log")
           rm $THIS_TEMP
-          SAFE_M=$(echo $M | md5sum | awk '{print $1}')
+          SAFE_M=$(echo $M | md5sum | cut -d' ' -f1)
           eval TEMP_DOWNLOAD_LOG_$SAFE_M=$THIS_TEMP
       done
       (
           for M in $LIST $MODULES; do
-              SAFE_M=$(echo $M | md5sum | awk '{print $1}')
+              SAFE_M=$(echo $M | md5sum | cut -d' ' -f1)
               eval THIS_TEMP=\$TEMP_DOWNLOAD_LOG_$SAFE_M
               lget $M > $THIS_TEMP 2>&1 &
               echo "$M:`jobs -p`:$THIS_TEMP" >> $TEMP_DOWNLOAD_PIDS
