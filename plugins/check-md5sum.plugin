@@ -31,8 +31,8 @@ plugin_module_check_md5sum()  {
     grep "/bin/\|/games/\|/include/\|/lib/\|/sbin/" "$MD5_LOG" |
             grep -v "/doc/\|/etc/\|/fonts/\|/man/\|/var/" |
             while read LINE ; do
-      if ! echo $LINE | md5sum --check --status ; then
-        FILE=$(echo $LINE | awk '{ print $2 }')
+      if ! echo "$LINE" | md5sum --check --status ; then
+        FILE="${LINE:34}"
         if [ -f "$FILE" ] && [ ! -h "$FILE" ] && file -b "$FILE" |
               egrep -q "executable|shared object|current ar archive|ASCII C?? program" ; then
           message "${FILE_COLOR}$FILE${DEFAULT_COLOR} of ${MODULE_COLOR}$MODULE${PROBLEM_COLOR} has wrong md5sum.${DEFAULT_COLOR}"
