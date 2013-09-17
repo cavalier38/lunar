@@ -892,7 +892,7 @@ show_info() {
     fi
 
     echo ""
-	ACTIVITY=$(view_file "$ACTIVITY_LOG" | awk "(\$3 == \"$1\")")
+	ACTIVITY=$(grep $'^[^\t]*\t[^\t]*\t'"$2"$'\t' "$ACTIVITY_LOG")
 
     if [ `echo "$ACTIVITY" | wc -l` -gt 10 ]; then
       ACTIVITY="`echo "$ACTIVITY" | tail -n10`"
@@ -1251,7 +1251,7 @@ main()  {
         if [ -z "$2" ]; then
           view_file "$ACTIVITY_LOG"
         else
-         view_file "$ACTIVITY_LOG" | awk "(\$3 == \"$2\")"
+         grep $'^[^\t]*\t[^\t]*\t'"$2"$'\t' "$ACTIVITY_LOG" | view_file
        fi
       else
         echo "No update log available."
