@@ -90,6 +90,7 @@ edit        module         copy a module to zlocal for editing
 diff        module         view changes on edited module
 submit      module         attempt to submit a module to the lunar ML
 unedit      module         delete zlocal copy of a module
+lint        module         verify the module syntax and guideline errors
 
 sum         [module]       display checksums
 md5sum      [module]       display md5sums
@@ -1653,6 +1654,10 @@ main()  {
 	 ;;
    new)
      new_module $2
+     ;;
+
+   lint)
+     lint_module $2
      ;;
 
    *)

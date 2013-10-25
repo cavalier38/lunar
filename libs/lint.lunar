@@ -1,0 +1,162 @@
+#!/bin/bash
+############################################################
+#                                                          #
+# lint.lunar - module files verification                   #
+#                                                          #
+############################################################
+#                                                          #
+# Copyright 2013 Peter de Ridder under GPLv2               #
+#                                                          #
+############################################################
+
+lint_details() {
+  local l line prev_line full_name full_value is var_name var_value var_quote1 var_quote2 align
+  linenr=0
+  while IFS="" read -r line ; do
+    ((l++))
+    # Strict syntax check
+    if [[ "$line" == "cat << EOF" ]] ; then
+      prev_line=""
+      while read line ; do
+	[[ "$prev_line" != 'EOF' ]] || echo "$1:$l: has a 'EOF' in the middle"
+	((l++))
+	prev_line="$line"
+      done
+      [[ "$prev_line" == 'EOF' ]] || echo "$1:$l: doesn't end with 'EOF'"
+      break
+    fi
+
+    # Strip comments. If the line ends with " or ' we assume it is quoted. We don't expect # to be inside a comment
+    [[ "${line: -1:1}" = \" || "${line: -1:1}" = \' ]] || line="${line%#*}"
+    [[ -z "$line" ]] &&  continue
+
+    full_name="${line%%=*}"
+    full_value="${line#*=}"
+    is="${line#"$full_name"}"
+    is="${is%"$full_value"}"
+    if [[ "$is" == '=' ]] ; then
+      # Variable assignment
+      var_name="${full_name#"${full_name%%[![:space:]]*}"}"
+      var_value="${full_value%%+([[:space:]])}"
+
+      # Not a full check, but basic validation
+      var_quote1=${var_value:0:1}
+      var_quote2=${var_value: -1:1}
+      [[ "$var_quote1" == \" && "$var_quote2" != \" ]] && echo "$1:$l: opening \" but not closing \""
+      [[ "$var_quote1" != \" && "$var_quote2" == \" ]] && echo "$1:$l: closing \" but not opening \""
+      [[ "$var_quote1" == \' && "$var_quote2" != \' ]] && echo "$1:$l: opening ' but not closing '"
+      [[ "$var_quote1" != \' && "$var_quote2" == \' ]] && echo "$1:$l: closing ' but not opening '"
+      [[ "$var_quote1" == \` && "$var_quote2" != \` ]] && echo "$1:$l: opening ' but not closing '"
+      [[ "$var_quote1" != \` && "$var_quote2" == \` ]] && echo "$1:$l: closing ' but not opening '"
+      if [[ "$var_value" =~ [[:space:]] ]] ; then
+	[[ "$var_quote1" == \" && "$var_quote2" == \" ]] || [[ "$var_quote1" == \' && "$var_quote2" == \' ]] || [[ "$var_quote1" == \` && "$var_quote2" == \` ]] || echo "$1:$l: space in value requires quotes"
+      elif [[ "$var_value" =~ [][\;\`\#] ]] ; then
+	[[ "$var_quote1" == \" && "$var_quote2" == \" ]] || [[ "$var_quote1" == \' && "$var_quote2" == \' ]] || [[ "$var_quote1" == \` && "$var_quote2" == \` ]] || echo "$1:$l: special character in value requires quotes"
+      fi
+
+      align="16"
+
+      # Known var names
+      case "$var_name" in
+	MODULE)
+	  [[ "$var_value" = "$MODULE" ]] || echo "$1:$l: invalid $var_name"
+	  ;;
+	VERSION)
+	  ;;
+	SOURCE)
+	  ;;
+	SOURCE_URL)
+	  ;;
+	SOURCE_VRY)
+	  ;;
+	WEB_SITE)
+	  ;;
+	ENTERED)
+	  if [[ "${#var_value}" -ne '8' ]] ; then
+	    echo "$1:$l: invalid $var_name length"
+	  elif [[ "$var_value" =~ [^0-9] ]] ; then
+	    echo "$1:$l: invalid $var_name characters"
+	  elif [[ "$(date -u +%Y%m%d)" -le "$var_value" ]] ; then
+	    echo "$1:$l: invalid $var_name future"
+	  fi
+	  ;;
+	UPDATED)
+	  if [[ "${var_value}" =~ date ]] ; then
+	    if [[ "${var_value:0:2}" == '$(' && "${var_value: -1:1}" == ')' ]] ; then
+	      date_value="${var_value:2:-1}"
+	    elif [[ "${var_value:0:1}" == '`' && "${var_value: -1:1}" == '`' ]] ; then
+	      date_value="${var_value:1:-1}"
+	    else
+	      echo "$1:$l: invalid $var_name date command"
+	    fi
+	    var_command="${date_value% +*}"
+	    [[ "${date_value% +*}" == 'date -u' ]] || echo "$1:$l: invalid $var_name date command"
+	    var_format="${date_value#*+}"
+	    [[ "${#var_format}" -eq '6' ]] || echo "$1:$l: invalid $var_name date format length"
+	    [[ "$var_format" =~ %Y%m%d || "$var_format" =~ %Y[0-1][0-9][0-3][0-9] || "$var_format" =~ %Y%m[0-3][0-9] ]] || echo "$1:$l: invalid $var_name date format"
+	  elif [[ "${#var_value}" -ne '8' ]] ; then
+	    echo "$1:$l: invalid $var_name length"
+	  elif [[ "$var_value" =~ [^0-9] ]] ; then
+	    echo "$1:$l: invalid $var_name characters"
+	  elif [[ "$(date -u +%Y%m%d)" -lt "$var_value" ]] ; then
+	    echo "$1:$l: invalid $var_name future"
+	  fi
+	  ;;
+	SHORT)
+	  ;;
+	SOURCE_DIRECTORY)
+	  ;;
+	*)
+	  align=""
+	  ;;
+      esac
+
+      # Strict syntax check
+      [[ -z "$align" ]] || [[ "${#full_name}" -eq "$align" ]] || echo "$1:$l: '=' misaligned"
+
+    elif [[ -z "${line/ /}" ]] ; then
+      # Strict syntax check
+      echo "$1:$l: empty line contains spaces"
+    else
+      echo "$1:$l: commands not allowed '$line'"
+    fi
+    
+  done < $1
+}
+
+lint_files() {
+  for file in $1 $1.* ; do
+    if [ -e "$file" ] ; then
+      [ -f "$file" ] || echo "$file exists but is not a regular file"
+      $2 $file
+    fi
+  done
+}
+
+lint_module() {
+  MODULE=$1
+  SCRIPT_DIRECTORY=$MOONBASE/$(find_section $MODULE)/$MODULE
+
+  if [ ! -d "$SCRIPT_DIRECTORY" ] ; then
+    echo "Module not found in moonbase"
+    return 1
+  fi
+
+  [ -f "$SCRIPT_DIRECTORY/DETAILS" ] || echo "DETAILS file missing for module"
+
+  [ -z "$(find $SCRIPT_DIRECTORY -name 'DEPENDS.*')" ] || echo "Architecture specific DEPENDS is not supported"
+
+  (
+    cd $SCRIPT_DIRECTORY
+    lint_files DETAILS lint_details
+#    lint_files CONFLICTS lint_conflicts
+#    lint_files CONFIGURE lint_configure
+#    lint_files DEPENDS lint_depends
+#    lint_files PRE_REMOVE lint_pre_remove
+#    lint_files PRE_BUILD lint_pre_build
+#    lint_files BUILD lint_build
+#    lint_files POST_BUILD lint_post_build
+#    lint_files POST_INSTALL lint_post_install
+#    lint_files POST_REMOVE lint_post_remove
+  )
+}
