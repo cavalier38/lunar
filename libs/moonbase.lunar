@@ -38,15 +38,15 @@ get_moonbase () {
   run_details moonbase
   rm -f $TMPDIR/$SOURCE
 
-  if [ ! -d "$SYSTEM_MOONBASE" ] ; then
+  if [[ ! -d "$SYSTEM_MOONBASE" ]] ; then
     mkdir -p $SYSTEM_MOONBASE
   fi
 
-  if [ ! -d "$SYSTEM_MOONBASE/zlocal" ] ; then
+  if [[ ! -d "$SYSTEM_MOONBASE/zlocal" ]] ; then
     mkdir -p $SYSTEM_MOONBASE/zlocal
   fi
 
-  if [ "$SYSTEM_MOONBASE" == "$MOONBASE" ]; then
+  if [[ "$SYSTEM_MOONBASE" == "$MOONBASE" ]]; then
     push_uniq_id
     if ! download_module $MODULE ; then
       OUTCOME=failed
@@ -77,7 +77,7 @@ get_moonbase () {
     fi
   fi
   
-  if [ "$OUTCOME" != "failed" ] ; then
+  if [[ "$OUTCOME" != "failed" ]] ; then
     # get ready to regenerate the module index cache file
     create_module_index &&
     create_depends_cache &&
@@ -89,7 +89,7 @@ get_moonbase () {
   fi
 
   activity_log "lin" "moonbase" "$VERSION" "$OUTCOME" "$INFO"
-  if [ "$OUTCOME" == "failed" ] ; then
+  if [[ "$OUTCOME" == "failed" ]] ; then
     return 1
   fi
 )

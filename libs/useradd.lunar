@@ -23,12 +23,12 @@ function add_priv_group() {
   local GROUPNAME
   debug_msg "function add_priv_group ($@)"
 
-  if [ -n "$INSTALLWATCHFILE" ] ; then
+  if [[ -n "$INSTALLWATCHFILE" ]] ; then
     devoke_installwatch
   fi
   GROUPNAME=$1
 
-  if [ -z "$GROUPNAME" ] ; then
+  if [[ -z "$GROUPNAME" ]] ; then
     message "${PROBLEM_COLOR}!add_priv_user: no groupname specified${DEFAULT_COLOR}"
     exit 1
   fi
@@ -38,11 +38,11 @@ function add_priv_group() {
   else
     # add the group:
     for (( N=0 ; N<100 ; N++)) ; do
-      if [ -z "$(cut -d: -f3 /etc/group | grep "^$N$" )" ] ; then
+      if [[ -z "$(cut -d: -f3 /etc/group | grep "^$N$" )" ]] ; then
         break
       fi
     done
-    if [ "$N" == "100" ] ; then
+    if [[ "$N" == "100" ]] ; then
       message "${PROBLEM_COLOR}!add_priv_user: no more group id's left under gid=100, bailing out!${DEFAULT_COLOR}"
       exit 1
     fi
@@ -50,7 +50,7 @@ function add_priv_group() {
     groupadd -g $N $GROUPNAME
   fi
 
-  if [ -n "$INSTALLWATCHFILE" ] ; then
+  if [[ -n "$INSTALLWATCHFILE" ]] ; then
     invoke_installwatch
   fi
 }
@@ -63,18 +63,18 @@ function add_priv_user() {
   local USERNAME GROUPNAME
   debug_msg "function add_priv_user ($@)"
 
-  if [ -n "$INSTALLWATCHFILE" ] ; then
+  if [[ -n "$INSTALLWATCHFILE" ]] ; then
     devoke_installwatch
   fi
   USERNAME=$(echo $1 | cut -d: -f1)
   GROUPNAME=$(echo $1 | cut -d: -f2)
 
-  if [ -z "$USERNAME" ] ; then
+  if [[ -z "$USERNAME" ]] ; then
     message "${PROBLEM_COLOR}!add_priv_user: no username specified${DEFAULT_COLOR}"
     exit 1
   fi
 
-  if [ -z "$GROUPNAME" ] ; then
+  if [[ -z "$GROUPNAME" ]] ; then
     message "${PROBLEM_COLOR}!add_priv_user: no groupname specified${DEFAULT_COLOR}"
     exit 1
   fi
@@ -92,11 +92,11 @@ function add_priv_user() {
 
     # add the user:
     for (( N=0 ; N<100 ; N++)) ; do
-      if [ -z "$(cut -d: -f3 /etc/passwd | grep "^$N$" )" ] ; then
+      if [[ -z "$(cut -d: -f3 /etc/passwd | grep "^$N$" )" ]] ; then
         break
       fi
     done
-    if [ "$N" == "100" ] ; then
+    if [[ "$N" == "100" ]] ; then
       message "${PROBLEM_COLOR}!add_priv_user: no more user id's left under uid=100, bailing out!${DEFAULT_COLOR}"
       exit 1
     fi
@@ -108,7 +108,7 @@ function add_priv_user() {
 
   fi
 
-  if [ -n "$INSTALLWATCHFILE" ] ; then
+  if [[ -n "$INSTALLWATCHFILE" ]] ; then
     invoke_installwatch
   fi
 }

@@ -31,19 +31,19 @@ set_config()
 	FILE=$1
 
 	shift 2
-	if [ "$FILE" == "$LOCAL_CONFIG" ] ; then
+	if [[ "$FILE" == "$LOCAL_CONFIG" ]] ; then
 		NEW="$(printf "%16s" "$VAR")=\"$@\""
 	else
 		NEW="$VAR=\"$@\""
 	fi
 
 	# on-demand creation
-	if [ ! -f $FILE ] ; then
+	if [[ ! -f $FILE ]] ; then
 		touch $FILE
 	fi
 
 	lock_file $FILE &&
-	if [ -n "$LINE" ] ; then
+	if [[ -n "$LINE" ]] ; then
 		sedit "/^\s*$VAR=/d" $FILE
 	fi
 	echo "$NEW" >> $FILE
@@ -56,12 +56,12 @@ unset_config()
 	debug_msg "unset_config ($@)"
 
 	# on-demand creation
-	if [ ! -f $1 ] ; then
+	if [[ ! -f $1 ]] ; then
 		touch $1
 	fi
 
 	lock_file $1 &&
-	if [ -n "$2" ] ; then
+	if [[ -n "$2" ]] ; then
 		# make sure we escape those ':' characters:
 		sedit "/^[ ]*$2=/d" $1
 	fi
@@ -102,7 +102,7 @@ get_local_config() {
 set_module_config()
 {
 	debug_msg "set_module_config ($@)"
-	if [ -n "$MODULE" ] ; then
+	if [[ -n "$MODULE" ]] ; then
 		set_config "$DEPENDS_CONFIG/$MODULE" "$1" "$2"
 	fi
 }
@@ -111,7 +111,7 @@ set_module_config()
 unset_module_config()
 {
 	debug_msg "unset_module_config ($@)"
-	if [ -n "$MODULE" ] ; then
+	if [[ -n "$MODULE" ]] ; then
 		unset_config "$DEPENDS_CONFIG/$MODULE" "$1"
 	fi
 }
@@ -120,7 +120,7 @@ unset_module_config()
 get_module_config()
 {
 	debug_msg "get_module_config ($@)"
-	if [ -n "$MODULE" ] ; then
+	if [[ -n "$MODULE" ]] ; then
 		get_config "$DEPENDS_CONFIG/$MODULE" "$1"
 	fi
 }
@@ -129,7 +129,7 @@ get_module_config()
 get_other_module_config()
 {
 	debug_msg "get_other_module_config ($@)"
-	if [ -n "$1" ] ; then
+	if [[ -n "$1" ]] ; then
 		get_config "$DEPENDS_CONFIG/$1" "$2"
 	fi
 }

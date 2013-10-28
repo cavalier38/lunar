@@ -31,7 +31,7 @@
 ld_add() {
 	debug_msg "ld_add ($@)"
 
-	if [ ! -z "$1" ] && [ -d "$1" ] ; then
+	if [[ ! -z "$1" && -d "$1" ]] ; then
 		if ! grep -q "$1" /etc/ld.so.conf; then
 			verbose_msg "Adding $1 to ld.so.conf"
 			echo "$1" >> /etc/ld.so.conf
@@ -47,7 +47,7 @@ ld_add() {
 ld_remove() {
 	debug_msg "ld_remove ($@)"
 
-	if [ ! -z "$1" ]; then
+	if [[ ! -z "$1" ]]; then
 		if grep -q "$1" /etc/ld.so.conf ; then
 
 			TMP_LD_CONF=$(temp_create "ldsoconf")
@@ -69,7 +69,7 @@ directories() {
 	debug_msg "directories ($@)"
 	local ITEM
 	while read ITEM ; do
-		if [ -d "$ITEM" ] && [ ! -h "$ITEM" ] ; then
+		if [[ -d "$ITEM" && ! -h "$ITEM" ]] ; then
 			echo "$ITEM"
 		fi
 	done
@@ -83,7 +83,7 @@ files() {
 	debug_msg "files ($@)"
 	local ITEM
 	while read ITEM ; do
-		if [ -f "$ITEM" ] && [ ! -h "$ITEM" ] ; then
+		if [[ -f "$ITEM" && ! -h "$ITEM" ]] ; then
 			echo "$ITEM"
 		fi
 	done
@@ -97,7 +97,7 @@ symlinks() {
 	debug_msg "symlinks ($@)"
 	local ITEM
 	while read ITEM ; do
-		if [ -h "$ITEM" ] ; then
+		if [[ -h "$ITEM" ]] ; then
 			echo "$ITEM"
 		fi
 	done
@@ -123,7 +123,7 @@ exists() {
 	debug_msg "exists ($@)"
 	local ITEM
 	while read ITEM ; do
-		if [ -e "$ITEM" ] || [ -L "$ITEM" ]; then
+		if [[ -e "$ITEM" || -L "$ITEM" ]]; then
 			echo "$ITEM"
 		fi
 	done
@@ -136,7 +136,7 @@ exists() {
 filter() {
 	debug_msg "filter ($@)"
 	local TMP_GREPRE
-	if [ -f "$1" ] ; then
+	if [[ -f "$1" ]] ; then
 		TMP_GREPRE=$(temp_create "fgrep")
 		directories < $1 | sed -e 's:^:^:g' -e 's:$:/:g'   > $TMP_GREPRE
 		files       < $1 | sed -e 's:^:^:g' -e 's:$:\$:g' >> $TMP_GREPRE
@@ -172,8 +172,8 @@ find_pam_aware()  {
 
 	for MODULE in $(list_installed); do 
 		SECTION=$(find_section $MODULE)
-		if [ -d "$MOONBASE/$SECTION/$MODULE/pam.d" ] && 
-			     [ "$MODULE" != "Linux-PAM" ]; then
+		if [[ -d "$MOONBASE/$SECTION/$MODULE/pam.d" ]] &&
+			     [[ "$MODULE" != "Linux-PAM" ]]; then
 			echo $MODULE
 		fi
 	done
@@ -206,7 +206,7 @@ custom_filters()
 
 last_kernel()
 {
-	if [ -f /usr/src/linux/include/linux/utsrelease.h ]; then
+	if [[ -f /usr/src/linux/include/linux/utsrelease.h ]]; then
 		grep UTS_RELEASE /usr/src/linux/include/linux/utsrelease.h | cut -d'"' -f2
 	else
 		grep UTS_RELEASE /usr/src/linux/include/linux/version.h | cut -d'"' -f2
@@ -222,9 +222,9 @@ xzbz_file()
 {
   local FILE FILE_BZ
   FILE="$1.xz"
-  if [ ! -f $FILE ] ; then
+  if [[ ! -f "$FILE" ]] ; then
     FILE_BZ="$1.bz2"
-    if [ -f $FILE_BZ ] ; then
+    if [[ -f "$FILE_BZ" ]] ; then
       FILE="$FILE_BZ"
     fi
   fi

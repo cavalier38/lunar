@@ -10,7 +10,7 @@
 # purpose  : to view a file
 view_file()  {
   debug_msg "view_file ($@)"
-  if [ -n "$1" ] ; then
+  if [[ -n "$1" ]] ; then
     # show a file $1
     case $(file -b $1 | cut -d' ' -f1) in
       bzip2) bzcat $1 | ${PAGER:-less} ;;

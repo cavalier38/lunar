@@ -21,15 +21,15 @@ unalias() {
   local TARGET TARGETS TARGETBYNUM N CHOICE CACHED_ALIAS
   # lookup in cache
   CACHED_ALIAS=$(get_local_config `echo LUNAR_ALIAS_${1:1}`)
-  if [ -n "$CACHED_ALIAS" ]; then
+  if [[ -n "$CACHED_ALIAS" ]]; then
     echo $CACHED_ALIAS
     return
   fi
 
   debug_msg "unalias($@)"
   # try to figure out where the aliases file is:
-  if [[ -z "$ALIASES" ]] || [[ ! -f "$ALIASES" ]]; then
-    if [ -f "$MOONBASE/aliases" ] ; then
+  if [[ -z "$ALIASES" || ! -f "$ALIASES" ]]; then
+    if [[ -f "$MOONBASE/aliases" ]] ; then
       ALIASES="$MOONBASE/aliases"
     else
       ALIASES="/var/lib/lunar/aliases"

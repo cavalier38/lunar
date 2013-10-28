@@ -24,8 +24,8 @@ function lock_file() {
    debug_msg "lock_file ($@)"
    function file_lock() {
       #locking is disabled if ln or rm not found!!
-      [ -x "/bin/ln" ] || return 0
-      [ -x "/bin/rm" ] || return 0
+      [[ -x "/bin/ln" ]] || return 0
+      [[ -x "/bin/rm" ]] || return 0
 
       TEMPFILE="$1.$$"
       LOCKFILE="$1.lock"
@@ -38,7 +38,7 @@ function lock_file() {
       fi
 
       # file exists?
-      if [ ! -f "$1" ]; then
+      if [[ ! -f "$1" ]]; then
         touch "$1"
       fi
 	  
@@ -47,12 +47,12 @@ function lock_file() {
         rm -f $TEMPFILE
         return 0
       # failed due to other lock?
-      elif [ ! -f "$LOCKFILE" ]; then
+      elif [[ ! -f "$LOCKFILE" ]]; then
         return 1
       fi
       # stale lock?
       STALE_PID=`< $LOCKFILE`
-      if [ "$STALE_PID" -le "0" ]; then
+      if [[ "$STALE_PID" -le "0" ]]; then
         return 1
       fi
       if kill -0 $STALE_PID 2>/dev/null; then
@@ -84,7 +84,7 @@ function lock_file() {
 function unlock_file() {
   debug_msg "unlock_file ($@)"
   #unlocking is disabled if rm not found!!
-  [ -x "/bin/rm" ] || return 0
+  [[ -x "/bin/rm" ]] || return 0
   rm -f $1.lock 2>/dev/null && return 0
   return 1
 }
@@ -92,8 +92,8 @@ function unlock_file() {
 
 lin_locked()  {
   debug_msg "lin_locked ($@)"
-  [     -f        /var/lock/installing.$1  ]  &&
-  ps        `< "/var/lock/installing.$1"`    |
+  [[ -f "/var/lock/installing.$1" ]]  &&
+  ps `< "/var/lock/installing.$1"`    |
   grep  -q  "lin"
 }
 

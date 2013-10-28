@@ -40,7 +40,7 @@ Example: .mit.edu,mysite.com"
 
     HPROXY=`inputbox "$HTTP_PROMPT" "$http_proxy"` &&
     
-    [ "$ftp_proxy" == "" ] && ftp_proxy="$HPROXY"
+    [[ "$ftp_proxy" == "" ]] && ftp_proxy="$HPROXY"
 
     FPROXY=`inputbox "$FTP_PROMPT" "$ftp_proxy"`   &&
     NPROXY=`inputbox "$NO_PROMPT"  "$no_proxy"`
@@ -55,7 +55,7 @@ confirm_proxy_settings() {
 
   FINISHED=NO
 
-  while [ "$FINISHED" != "YES" ] ; do
+  while [[ "$FINISHED" != "YES" ]] ; do
     PROMPT="Are these settings correct?"
     PROMPT="$PROMPT\nHTTP Proxy:  $HPROXY"
     PROMPT="$PROMPT\n FTP Proxy:  $FPROXY"
@@ -143,7 +143,7 @@ FTP_ACTIVE=on in DETAILS file :=) or vice-versa."
    FTP_ACTIVE=${FTP_ACTIVE:-off}
    FTP_PASSIVE=${FTP_PASSIVE:-on}
 
-   [ "$FTP_ACTIVE" == "on" ] && 
+   [[ "$FTP_ACTIVE" == "on" ]] &&
    FTP_PASSIVE=off || 
    FTP_PASSIVE=on
 
@@ -188,7 +188,7 @@ CONTINUE=off in DETAILS file :=) or vice-versa."
    #lets get rid of " and spaces in the variable
    PARTIAL=`echo $PARTIAL | sed s/\"//g | tr -d " "`
 
-   if [ "$PARTIAL" == "Enable" ] ; then
+   if [[ "$PARTIAL" == "Enable" ]] ; then
      set_local_config "CONTINUE" "on"
    else
      set_local_config "CONTINUE" "off"
@@ -219,7 +219,7 @@ USE_CACHE=off in DETAILS file :=) or vice-versa."
    #lets get rid of " and spaces in the variable
    CACHE=`echo $CACHE | sed s/\"//g | tr -d " "`
 
-   if [ "$CACHE" == "Enable" ] ; then
+   if [[ "$CACHE" == "Enable" ]] ; then
      set_local_config "USE_CACHE" "on"
    else
      set_local_config "USE_CACHE" "off"
@@ -268,7 +268,7 @@ should be reported to maintainer@lunar-linux.org.
 
   EXHAUSTIVE=`echo $EXHAUSTIVE | sed s/\"//g | tr -d " "`
 
-  if [ "$EXHAUSTIVE" == "Enable" ] ; then
+  if [[ "$EXHAUSTIVE" == "Enable" ]] ; then
     set_local_config "EXHAUSTIVE" "on"
   else
     set_local_config "EXHAUSTIVE" "off"

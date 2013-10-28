@@ -13,7 +13,7 @@
 
 plugin_module_check_find() {
   local MODULE VERSION I_LOG FIND_STATUS IFS_OLD IFS LOG ITEM
-  if [ "$FIND_CHECK" == "off" ] ; then
+  if [[ "$FIND_CHECK" == "off" ]] ; then
     return 2
   fi
   debug_msg "plugin_module_check_find ($@)"
@@ -23,14 +23,14 @@ plugin_module_check_find() {
   I_LOG=$INSTALL_LOGS/$MODULE-$VERSION
   FIND_STATUS=2
 
-  if [ -e "$I_LOG" ]; then
+  if [[ -e "$I_LOG" ]]; then
     IFS_OLD="$IFS"
     export IFS=$'\n'
 
     LOG=$(grep "/bin/\|/games/\|/include/\|/lib/\|/sbin/" "$I_LOG" | grep -v  "/doc/\|/etc/\|/fonts/\|/man/\|/var/")
 
     for ITEM in $LOG ; do
-      if [ ! -e "$ITEM" ]; then
+      if [[ ! -e "$ITEM" ]]; then
         (
           export IFS="$IFS_OLD"
           message "${FILE_COLOR}${ITEM}${DEFAULT_COLOR} of ${MODULE_COLOR}${MODULE}${PROBLEM_COLOR} is missing.${DEFAULT_COLOR}"

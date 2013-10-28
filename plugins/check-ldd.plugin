@@ -12,7 +12,7 @@
 
 plugin_module_check_ldd() {
   local MODULE VERSION I_LOG LDD_STATUS IFS_OLD IFS NEW_LD LOG FILE
-  if [ "$LDD_CHECK" == "off" ]; then
+  if [[ "$LDD_CHECK" == "off" ]]; then
     return 2
   fi
   debug_msg "plugin_module_check_ldd ($@)"
@@ -22,7 +22,7 @@ plugin_module_check_ldd() {
   I_LOG=$INSTALL_LOGS/$MODULE-$VERSION
   LDD_STATUS=2
 
-  if [ -e "$I_LOG" ]; then
+  if [[ -e "$I_LOG" ]]; then
     IFS_OLD="$IFS"
     export IFS=$'\n'
 
@@ -31,7 +31,7 @@ plugin_module_check_ldd() {
     LOG=$(grep "/bin/\|/games/\|/lib/\|/sbin/\|/libexec/" "$I_LOG" | grep -v "/doc/\|/fonts/\|/include/\|/locale/\|/man/\|/modules/\|/var/")
 
     for FILE in $LOG; do
-      if [ -f "$FILE" ] && [ ! -h "$FILE" ] && file -b "$FILE" | grep -q "ELF" && LD_LIBRARY_PATH=$NEW_LD ldd "$FILE" 2>&1 | grep -q "not found" ; then
+      if [[ -f "$FILE" && ! -h "$FILE" ]] && file -b "$FILE" | grep -q "ELF" && LD_LIBRARY_PATH=$NEW_LD ldd "$FILE" 2>&1 | grep -q "not found" ; then
         (
           export IFS="$IFS_OLD"
           message "${FILE_COLOR}${FILE}${DEFAULT_COLOR} of ${MODULE_COLOR}${MODULE} ${PROBLEM_COLOR}is broken. ${DEFAULT_COLOR}"

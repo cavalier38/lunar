@@ -16,7 +16,7 @@ prune() {
   local TMP_SPOOL_KEEP TMP_CACHE_KEEP MODULE SOURCE VERSION FILE LOGS
   debug_msg "prune ($@)"
 
-  if [ -z "$BUILD" ] ; then
+  if [[ -z "$BUILD" ]] ; then
     eval $(grep BUILD= /etc/lunar/local/optimizations)
   fi
   
@@ -26,7 +26,7 @@ prune() {
   message "${MESSAGE_COLOR}Generating keep lists...${DEFAULT_COLOR}"
   for MODULE in $(list_installed) ; do
     # spool:
-    if [ ! "$MODULE" == "moonbase" ]; then
+    if [[ ! "$MODULE" == "moonbase" ]]; then
       for SOURCE in $(sources $MODULE) ; do
         echo $SOURCE >> $TMP_SPOOL_KEEP
       done

@@ -16,7 +16,7 @@ run_checks() {
 	(
 		run_details $1
 		plugin_call MODULE_CHECK $1
-		if [ $? == 2 ]; then
+		if [[ $? == 2 ]]; then
 			return 0
 		fi
 		return 1
@@ -87,7 +87,7 @@ fix_depends () {
 	local LIST
 	debug_msg "fix_depends  ($@)"
 
-	if [ -n "$1" ] ; then
+	if [[ -n "$1" ]] ; then
 		LIST="$@"
 	else
 		LIST=$(list_installed | fgrep -v -x moonbase)
@@ -104,7 +104,7 @@ run_fix()  {
 	debug_msg "run_fix ($@)"
 	MODULES=$*
 
-	if [ -z "$MODULES" ] ; then
+	if [[ -z "$MODULES" ]] ; then
 		MODULES=$(list_installed | fgrep -v -x moonbase)
 	fi
 
@@ -129,7 +129,7 @@ run_fix()  {
 	fi
 
 	# if we were called with --fixdepends then we may skip the rest
-	if [ -n "$FIXDEPENDS" ] ; then
+	if [[ -n "$FIXDEPENDS" ]] ; then
 		return
 	fi
 

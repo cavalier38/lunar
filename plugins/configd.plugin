@@ -16,14 +16,14 @@ plugin_configd_post_build()
 
   debug_msg "plugin_configd_post_build ($@)"
 
-  if [ -d $SCRIPT_DIRECTORY/config.d ]; then
+  if [[ -d "$SCRIPT_DIRECTORY/config.d" ]]; then
     verbose_msg "Handling 'config.d' files"
     invoke_installwatch
 
-    [ -d /etc/config.d ] || mkdir -p /etc/config.d
+    [[ -d /etc/config.d ]] || mkdir -p /etc/config.d
 
     for FILE in $SCRIPT_DIRECTORY/config.d/*; do
-      if [ ! -f /etc/config.d/${FILE##*/} ]; then
+      if [[ ! -f "/etc/config.d/${FILE##*/}" ]]; then
         verbose_msg "Installing ${FILE##*/} into /etc/config.d"
         /usr/bin/install -g 0 -o 0 -m 0644 $FILE /etc/config.d/
       fi

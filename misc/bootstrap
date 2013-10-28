@@ -10,7 +10,7 @@
 ############################################################
 
 # check if /etc/lunar/config is loaded
-if [ -z "$BOOTSTRAP" ] ; then
+if [[ -z "$BOOTSTRAP" ]] ; then
   . /etc/lunar/config
 fi
 
@@ -18,7 +18,7 @@ for FUNCTION in $FUNCTIONS/*.lunar ; do
   . $FUNCTION
 done
 
-if [ -s "$LOCAL_CONFIG" ] ; then
+if [[ -s "$LOCAL_CONFIG" ]] ; then
   . $LOCAL_CONFIG
 fi
 

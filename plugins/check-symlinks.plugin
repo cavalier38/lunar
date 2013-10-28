@@ -14,7 +14,7 @@
 plugin_module_check_symlinks()  {
   local MODULE VERSION I_LOG IFS_OLD IFS ITEM TRAGET
   # return CONTINUE if we're disabled
-  if [ "$SYM_CHECK" == "off" ]; then
+  if [[ "$SYM_CHECK" == "off" ]]; then
     return 2
   fi
   debug_msg "plugin_module_check_symlinks ($@)"
@@ -23,12 +23,12 @@ plugin_module_check_symlinks()  {
   VERSION=$(installed_version $MODULE)
   I_LOG=$INSTALL_LOGS/$MODULE-$VERSION
 
-  if [ -e "$I_LOG" ]; then
+  if [[ -e "$I_LOG" ]]; then
     IFS_OLD="$IFS"
     export IFS=$'\n'
 
     < "$I_LOG" while read ITEM ; do
-      if [ -h "$ITEM" ] && [ -f "$ITEM" ] ; then
+      if [[ -h "$ITEM" && -f "$ITEM" ]] ; then
       TARGET=$( basename $( ls -la "$ITEM" | cut -d '>' -f2 | cut -c 2- ) )
         if ! grep -q "$TARGET" "$I_LOG" ; then
          (

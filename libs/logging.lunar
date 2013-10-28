@@ -52,10 +52,10 @@ progress() {
     while true ; do
       read -t 2 LINE
       STATUS=$?
-      if [ $STATUS -gt 128 ]; then
+      if [[ "$STATUS" -gt 128 ]]; then
         sleep 2
 	continue
-      elif [ $STATUS -eq 1 ]; then
+      elif [[ "$STATUS" -eq 1 ]]; then
         echo -ne "\r [${X:0:60}] (100%)\n"
         exit
       fi
@@ -75,10 +75,10 @@ progress() {
     while true ; do
       read -t 2 LINE
       STATUS=$?
-      if [ $STATUS -gt 128 ]; then
+      if [[ "$STATUS" -gt 128 ]]; then
         sleep 2
 	continue
-      elif [ $STATUS -eq 1 ]; then
+      elif [[ "$STATUS" -eq 1 ]]; then
 	echo -ne "\r [#]\n"
         exit
       fi
@@ -95,7 +95,7 @@ progress() {
 
 activate_voyeur()  {
   debug_msg "activate_voyeur ($@)"
-  if [ -z "$SILENT" ] ; then
+  if [[ -z "$SILENT" ]] ; then
     case $VOYEUR in
       on) ( tee -a $C_LOG < $C_FIFO            ; rm -f "$C_FIFO" ) & ;;
       p*) ( tee -a $C_LOG < $C_FIFO | progress ; rm -f "$C_FIFO" ) & ;;

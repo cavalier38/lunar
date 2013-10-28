@@ -49,7 +49,7 @@ handle_config_files() {
   debug_msg "handle_config_files ($@)"
   if dirname "$1" | grep -q "^/etc" ; then
     # we can safely delete symlinks without md5sum checks
-    if [ -L "$1" ] ; then
+    if [[ -L "$1" ]] ; then
       return 0
     fi
 
@@ -58,24 +58,24 @@ handle_config_files() {
     TARGET_MD5=$(md5sum "$1" | cut -d " " -f 1-1)
     OLD_MD5=$(grep -w "$1\$" "$MD5_LOG" | cut -d " " -f 1-1)
 
-    if [ -z "$TARGET_MD5" ] ; then
+    if [[ -z "$TARGET_MD5" ]] ; then
       verbose_msg "Skipping removal of \"$1\" due to problem with md5sum"
       return 1
     fi
 
-    if [ -z "$OLD_MD5" ] ; then
+    if [[ -z "$OLD_MD5" ]] ; then
       verbose_msg "Skipping removal of \"$1\" due to missing original md5sum"
       return 1
     fi
 
-    if [ "$TARGET_MD5" == "$OLD_MD5" ] ; then
+    if [[ "$TARGET_MD5" == "$OLD_MD5" ]] ; then
       debug_msg "removing \"$1\""
       return 0
     fi
 
-    if [ "$TARGET_MD5" != "$OLD_MD5" ] ; then
+    if [[ "$TARGET_MD5" != "$OLD_MD5" ]] ; then
       verbose_msg "Skipping removal of \"$1\" due to md5sum mismatch"
-      if [ "$PRESERVE" == "on" ] ; then
+      if [[ "$PRESERVE" == "on" ]] ; then
          debug_msg "PRESERVE=on, keeping \"$1\""
          return 1
       else
@@ -91,17 +91,17 @@ handle_config_files() {
 
 remove_something() {
   debug_msg "remove_something ($@)"
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     verbose_msg "remove_something: Nothing to remove!"
     return 1
   fi
 
-  if ! [ -e "$1" ] && ! [ -L "$1" ] ; then
+  if ! [[ -e "$1" && ! -L "$1" ]] ; then
     verbose_msg "remove_something: no such file \"$1\"!"
     return 1
   fi
 
-  if [ -d "$1" ] && ! [ -L "$1" ]; then
+  if [[ -d "$1" && ! -L "$1" ]]; then
     if rmdir "$1" 2> /dev/null ; then
       debug_msg "ok    : rmdir \"$1\""
     else
@@ -121,7 +121,7 @@ remove_something() {
 process_directories() {
   debug_msg "process_directories ($@)"
 
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     debug_msg "process_directories: No args, exiting"
     return 1
   fi
@@ -144,17 +144,17 @@ lrm_module() {
   MD5_LOG=$MD5SUM_LOGS/$MODULE-$VERSION
 
   # time-out 1: PRE_REMOVE
-  if [ "$UPGRADE" != "on" ]; then
+  if [[ "$UPGRADE" != "on" ]]; then
     plugin_call BUILD_PRE_REMOVE $MODULE
     run_module_file $MODULE PRE_REMOVE
   fi
 
-  if [ "$MODULE" != "moonbase" ]; then
+  if [[ "$MODULE" != "moonbase" ]]; then
     update_plugin $MODULE remove
   fi
 
   # init.d scripts stop before rm phase, but only if ! upgrading
-  if [ "$KEEPCONFIG" != "on" -a "$UPGRADE" != "on" ] ; then
+  if [[ "$KEEPCONFIG" != "on" && "$UPGRADE" != "on" ]] ; then
     # pre-read these variables!
     SERVICES=$(get_module_config "SERVICES")
     XINETD=$(get_other_module_config "xinetd" "INITDSCRIPTS")
@@ -166,10 +166,10 @@ lrm_module() {
 
   # grep -v the install logs over the protected stuff, this
   # yields the files that may be removed
-  if [ "$REAP" == "on" ] ; then
+  if [[ "$REAP" == "on" ]] ; then
     grep -v -f "$PROTECTED" "$INST_LOG" | while read TARGET ; do
-      if [ -e "$TARGET" ] || [ -L "$TARGET" ]; then
-        if [ -d "$TARGET" ] ; then
+      if [[ -e "$TARGET" || -L "$TARGET" ]]; then
+        if [[ -d "$TARGET" ]] ; then
           echo "$TARGET" >> $TMP_DIRS
         else
           handle_config_files "$TARGET" &&
@@ -186,26 +186,26 @@ lrm_module() {
   remove_module $MODULE
 
   # time-out 2: POST_REMOVE
-  if [ "$UPGRADE" != "on" ] ; then
+  if [[ "$UPGRADE" != "on" ]] ; then
     plugin_call BUILD_POST_REMOVE $MODULE
     run_module_file $MODULE POST_REMOVE
   fi
-  if [ "$KEEPCONFIG" == "on" -o "$UPGRADE" == "on" ] ; then
+  if [[ "$KEEPCONFIG" == "on" || "$UPGRADE" == "on" ]] ; then
     debug_msg "skipping removal of dependency listing and configs"
   else
     verbose_msg "removing module from dependency listing and configs"
     remove_depends $MODULE
     # remove alias if required
-    if [ $MODULE != moonbase ] ; then
+    if [[ $MODULE != moonbase ]] ; then
       for ALIAS in `cut -d: -f1 "$MOONBASE/aliases"`; do
-        if [ "$(get_local_config `echo LUNAR_ALIAS_${ALIAS:1}`)" == "$MODULE" ]; then
+        if [[ "$(get_local_config `echo LUNAR_ALIAS_${ALIAS:1}`)" == "$MODULE" ]]; then
           verbose_msg "removing alias mapping from \"$ALIAS\" to \"$MODULE\""
           unset_local_config `echo LUNAR_ALIAS_${ALIAS:1}`
         fi
       done
     fi
     # restart xinetd after xinetd.confs have been removed by lrm...
-    if [ -n "$SERVICES" -a -n "$XINETD" ] ; then
+    if [[ -n "$SERVICES" && -n "$XINETD" ]] ; then
       verbose_msg "restarting xinetd"
       /etc/init.d/xinetd restart
     fi
@@ -227,7 +227,7 @@ check_status() {
     return 1
   fi
 
-  if [ "$NOSUSTAIN" != "on" -a "$UPGRADE" != "on" ] ; then
+  if [[ "$NOSUSTAIN" != "on" && "$UPGRADE" != "on" ]] ; then
     debug_msg "checking if \"$1\" is sustained"
     if grep -q "^$MODULE$" "$SUSTAINED" ; then
       message  "${MODULE_COLOR}${MODULE}"       \
@@ -255,24 +255,24 @@ downgrade() {
   verbose_msg "running \"$MODULE\" DETAILS file"
   run_details $MODULE &> /dev/null || return 1
 
-  if [ -z "$1" ] ; then
+  if [[ -z "$1" ]] ; then
     message "No version is entered. The below is the list of available files."
     list_available_cache   
   fi
 
   CACHE_XZ=$(xzbz_file "$INSTALL_CACHE/$MODULE-$1-$BUILD.tar")
 
-  if [ ! -s $CACHE_XZ ] ; then 
+  if [[ ! -s $CACHE_XZ ]] ; then
     message "Desired version is not available. Here is the available files"
     list_available_cache
   fi
 
   verbose_msg "checking if \"$MODULE\" is installed"
 
-  if [ -n "$(installed_version $MODULE)" ] ; then 
+  if [[ -n "$(installed_version $MODULE)" ]] ; then
     verbose_msg "\"$(installed_version $MODULE)\" of \"$MODULE\" is installed at the moment"
 
-    if [ "$1" == "$I_VERSION" ] ; then
+    if [[ "$1" == "$I_VERSION" ]] ; then
       message "The downgrade version is the same as the installed version"
       message "Here is the available files." 
       list_available_cache
@@ -313,7 +313,7 @@ downgrade() {
 
 GETOPT_ARGS=$(getopt -q -n lrm -o "dD:hknuvp" -l "debug,downgrade:,help,keepconfig,nosustain,upgrade,verbose,purge" -- "$@")
 
-if [ -z "$?" ] ; then
+if [[ -z "$?" ]] ; then
   help | view_file
   exit
 else
@@ -346,7 +346,7 @@ else
   for MODULE in "${@#-}" ; do
     if check_status "$MODULE" ; then
       # assemble purge list if requested
-      if [ "$PURGE" == "on" ] ; then
+      if [[ "$PURGE" == "on" ]] ; then
         DEPS=$(list_installed_depending "$MODULE" | sort -u)
         for DEP in $DEPS ; do
           # skip held modules

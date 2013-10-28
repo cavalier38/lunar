@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "x$1" = "x" ] ; then
+if [[ -z "$1" ]] ; then
   make install
 else
   make DESTDIR=$1 install

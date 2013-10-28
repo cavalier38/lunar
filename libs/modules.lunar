@@ -142,7 +142,7 @@ function check_module_index() {
 (
   debug_msg "check_module_index ($@)"
   local RESULT=1
-  if [[ ! -e $MODULE_INDEX ]] || [[ ! -e $DEPENDS_CACHE ]]; then
+  if [[ ! -e $MODULE_INDEX || ! -e $DEPENDS_CACHE ]]; then
     create_module_index
     create_depends_cache
     RESULT=0
@@ -184,7 +184,7 @@ find_section() {
 
 	# otherwise check for ordinary modules named that way
 	SECTION=$(sed -n "s/^$1://p;T;q" "$MODULE_INDEX")
-	if [[ -n "$SECTION" ]] && [[ -d "$MOONBASE/$SECTION/$1" ]] ; then
+	if [[ -n "$SECTION" && -d "$MOONBASE/$SECTION/$1" ]] ; then
 		echo "$SECTION"
 		return 0
 	fi
@@ -207,7 +207,7 @@ find_section() {
 
 	# and search again, this should be quick now
 	SECTION=$(sed -n "s/^$1://p;T;q" "$MODULE_INDEX")
-	if [[ -n "$SECTION" ]] && [[ -d "$MOONBASE/$SECTION/$1" ]] ; then
+	if [[ -n "$SECTION" && -d "$MOONBASE/$SECTION/$1" ]] ; then
 		echo "$SECTION"
 		return 0
 	fi
@@ -258,7 +258,7 @@ run_details() {
     SOURCE_DIRECTORY=${SOURCE_DIRECTORY:-$BUILD_DIRECTORY/$1-$VERSION}
     MODULE_CONFIG=${MODULE_CONFIG:-$DEPENDS_CONFIG/$MODULE}
     MODULE_PREFIX=${MODULE_PREFIX:-$DEFAULT_PREFIX}
-    if [ "$MODULE_PREFIX" != "$DEFAULT_PREFIX" ]; then
+    if [[ "$MODULE_PREFIX" != "$DEFAULT_PREFIX" ]]; then
       export PKG_CONFIG_PATH=$MODULE_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH
       export PATH=$PATH:$MODULE_PREFIX/bin
     fi
@@ -269,7 +269,7 @@ run_details() {
 
 has_module_file()
 {
-	if [[ -e "$SCRIPT_DIRECTORY/$2" ]] || [[ -e "$SCRIPT_DIRECTORY/$2.$PLATFORM" ]]; then
+	if [[ -e "$SCRIPT_DIRECTORY/$2" || -e "$SCRIPT_DIRECTORY/$2.$PLATFORM" ]]; then
 		return 0
 	else
 		return 1
@@ -326,7 +326,7 @@ module_license_accepted() {
   local L LICENSE IS_OSI
   LICENSE=$(run_details $1 > /dev/null ; echo $LICENSE)
   # assume it's osi if it's empty
-  if [ -z "$LICENSE" ]; then
+  if [[ -z "$LICENSE" ]]; then
     debug_msg "assuming LICENSE=\"osi\""
     LICENSE="osi"
   fi
@@ -345,7 +345,7 @@ module_license_accepted() {
   # * accept "all" will accept anything
   if [[ -n "$ACCEPTED_LICENSES" ]]; then
     for L in $ACCEPTED_LICENSES; do
-      if [[ "$L" == "osi" ]] && [[ "$IS_OSI" == "yes" ]] || [ "$L" == "all" ] || [ "$LICENSE" == "$L" ] ; then
+      if [[ "$L" == "osi" && "$IS_OSI" == "yes" || "$L" == "all" || "$LICENSE" == "$L" ]] ; then
         # explicitly accepted license!
 	debug_msg "module_license_accepted: \"$LICENSE\" is explicitly accepted"
         return 0
@@ -365,7 +365,7 @@ module_license_accepted() {
     # implicitly not rejected
     debug_msg "module_license_accepted: \"$LICENSE\" is not rejected"
     return 0
-  else ## if [ -z "${ACCEPTED_LICENSES}${REJECTED_LICESES}" ]; then
+  else ## if [[ -z "${ACCEPTED_LICENSES}${REJECTED_LICESES}" ]]; then
     # so now we have a problem - the user didn't set their prefs
     if [[ "$IS_OSI" != "yes" ]]; then
       error_message "${MODULE_COLOR}$1${DEFAULT_COLOR}: ${PROBLEM_COLOR}License \"$LICENSE\" cannot be accepted by default${DEFAULT_COLOR}"
@@ -485,7 +485,7 @@ exile_modules() {
 unexile_modules () {
   local MODULE
   debug_msg "unexile_modules  ($@)"
-  if [ -n "$1" ] ; then
+  if [[ -n "$1" ]] ; then
     lock_file $MODULE_STATUS_BACKUP &&
     lock_file $MODULE_STATUS &&
     for MODULE in "$@" ; do
@@ -521,7 +521,7 @@ enforce_modules() {
 unenforce_modules () {
   local MODULE
   debug_msg "unenforce_modules  ($@)"
-  if [ -n "$1" ] ; then
+  if [[ -n "$1" ]] ; then
     lock_file $MODULE_STATUS_BACKUP &&
     lock_file $MODULE_STATUS &&
     for MODULE in "$@" ; do
@@ -542,7 +542,7 @@ remove_module() {
   debug_msg "remove_module ($@)"
 
   # catch this on new boxes:
-  if [ ! -f $MODULE_STATUS ] ; then
+  if [[ ! -f "$MODULE_STATUS" ]] ; then
     touch $MODULE_STATUS $MODULE_STATUS_BACKUP $DEPENDS_STATUS $DEPENDS_STATUS_BACKUP
   fi
 
@@ -552,7 +552,7 @@ remove_module() {
   {
     OLD_STATE=$(get_module_state $1 "(installed|held)")
     grep -v "^$1:" "$MODULE_STATUS" > $MODULE_STATUS_BACKUP
-    if [ -n "$OLD_STATE" ]; then
+    if [[ -n "$OLD_STATE" ]]; then
       echo "$1::$OLD_STATE::" >> $MODULE_STATUS_BACKUP
     fi
     cp $MODULE_STATUS_BACKUP $MODULE_STATUS
@@ -570,7 +570,7 @@ add_module()  {
   debug_msg "add_module ($@)"
 
   # catch this on new boxes:
-  if [ ! -f $MODULE_STATUS ] ; then
+  if [[ ! -f "$MODULE_STATUS" ]] ; then
     touch $MODULE_STATUS $MODULE_STATUS_BACKUP $DEPENDS_STATUS $DEPENDS_STATUS_BACKUP
   fi
 
@@ -580,7 +580,7 @@ add_module()  {
   {
     OLD_STATE=$(get_module_state $1 $2)
     grep -v "^$1:" "$MODULE_STATUS" > $MODULE_STATUS_BACKUP
-    if [ -n "$OLD_STATE" ]; then
+    if [[ -n "$OLD_STATE" ]]; then
       OLD_STATE="+$OLD_STATE"
     fi
     echo "$1:$(date -u +%Y%m%d):$2$OLD_STATE:$3:$4" >> $MODULE_STATUS_BACKUP     &&
@@ -657,7 +657,7 @@ purge_modules() {
   debug_msg "purge_modules ($@)"
   verbose_msg "Discovering modules that were removed from moonbase"
   # safetynet: don't wipe everything
-  if [ $(list_moonbase | wc -l) -lt 100 ]; then
+  if [[ "$(list_moonbase | wc -l)" -lt 100 ]]; then
     error_message "${PROBLEM_COLOR}Error: ${DEFAULT_COLOR}${MESSAGE_COLOR} your moonbase seems damaged. Re-lin moonbase to fix.${DEFAULT_COLOR}"
     exit 1
   fi
@@ -680,17 +680,17 @@ purge_modules() {
 module_is_expired() {
   debug_msg "module_is_expired ($@)"
   (
-    if [ -z "$MODULE" ] ; then
+    if [[ -z "$MODULE" ]] ; then
       MODULE=$1
     fi
-    if [ "$MODULE" == moonbase ] ; then
+    if [[ "$MODULE" == moonbase ]] ; then
       return 255
     fi
     LINE=$(awk -F: -v mod=$MODULE '$1==mod && $3 ~ /(^|\+)installed(\+|$)/ && $3 !~ /(^|\+)held(\+|$)/ {print "IDATE="$2" IVERSION="$4}' "$MODULE_STATUS")
-    if [ -n "$LINE" ] ; then
+    if [[ -n "$LINE" ]] ; then
       eval $LINE
       if run_details $MODULE &> /dev/null ; then
-        if [[ "$VERSION" != "$IVERSION" ]] || [[ -z "$IDATE" ]] ||
+        if [[ "$VERSION" != "$IVERSION" || -z "$IDATE" ]] ||
 	  (( "$UPDATED" > "$IDATE" )) ; then
 	  return 0
 	fi
@@ -728,7 +728,7 @@ update_modules() {
   verbose_msg "Searching for modules to update"
   LIST=$(list_expired_modules)
 
-  if [ -z "$LIST" ] ; then
+  if [[ -z "$LIST" ]] ; then
     verbose_msg "Nothing to update!"
     return 255
   fi
@@ -740,7 +740,7 @@ update_modules() {
 
   verbose_msg "Checking for lunar or theedge"
   for MODULE in $LIST ; do
-    if [[ "$MODULE" == "lunar" ]] || [[ "$MODULE" == "theedge" ]] ; then
+    if [[ "$MODULE" == "lunar" || "$MODULE" == "theedge" ]] ; then
       message "${MODULE_COLOR}$MODULE${MESSAGE_COLOR} will be updated${DEFAULT_COLOR}"
       message "${MESSAGE_COLOR}Run lunar renew afterwards to update other modules${DEFAULT_COLOR}"
       if query "Do you wish to continue ? " y ; then
@@ -768,7 +768,7 @@ update_modules() {
   QUEUE=$(< "$TMP_QUEUE")
   temp_destroy $TMP_QUEUE
 
-  if [ -n "$QUEUE" ] ; then
+  if [[ -n "$QUEUE" ]] ; then
     lin -c $QUEUE
   else
     verbose_msg "Nothing to update!"
@@ -780,7 +780,7 @@ update_modules() {
 
 check_blacklist() {
   debug_msg "check_blacklist ($@)"
-  if [ -f /var/state/lunar/blacklist.$PLATFORM ] ; then
+  if [[ -f "/var/state/lunar/blacklist.$PLATFORM" ]] ; then
     if grep "^$MODULE$" "/var/state/lunar/blacklist.$PLATFORM" ; then
       error_message "${PROBLEM_COLOR}ERROR:${DEFAULT_COLOR}${MESSAGE_COLOR} Module ${DEFAULT_COLOR}${MODULE_COLOR}$MODULE${DEFAULT_COLOR}${MESSAGE_COLOR} is blacklisted and will not be installed!${DEFAULT_COLOR}"
       exit 0

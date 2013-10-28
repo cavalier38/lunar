@@ -57,7 +57,7 @@ main() {
   cd $TMPDIR
   
   MODULES="$@"
-  if [ -z "$MODULES" ] ; then
+  if [[ -z "$MODULES" ]] ; then
     verbose_msg "downloading entire moonbase"
     MODULES=$(list_moonbase | sort)
   fi
@@ -88,7 +88,7 @@ main() {
 
 GETOPT_ARGS=$(getopt -q -n lget -o "adf:hu:vw:" -l "all,debug,from:,help,url:,verbose,want:" -- "$@")
 
-if [ -z "$?" ] ; then
+if [[ -z "$?" ]] ; then
   help | view_file
   exit
 else
@@ -111,7 +111,7 @@ else
     esac
   done
 
-  if [ -n "$LGET_ALL" -o -n "$1" ] ; then
+  if [[ -n "$LGET_ALL" || -n "$1" ]] ; then
     main $@
   else
     help

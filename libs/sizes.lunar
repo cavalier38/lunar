@@ -26,15 +26,15 @@ find_module_size() {
    {
       local SIZE
       unset SIZE
-      [ -e "$MODULE_STATUS" ] &&
+      [[ -e "$MODULE_STATUS" ]] &&
       SIZE=$(sed -n "s/^$1:.*://p;T;q" "$MODULE_STATUS")
-      [ -n "$SIZE" ] && echo ${SIZE} || false
+      [[ -n "$SIZE" ]] && echo ${SIZE} || false
    }
 
-   [ -z "$1" ] && return
+   [[ -z "$1" ]] && return
 
-   [ -n "$2" ] && VERSION=$2 || VERSION=`installed_version $1`
-   [ -z "$VERSION" ] &&
+   [[ -n "$2" ]] && VERSION=$2 || VERSION=`installed_version $1`
+   [[ -z "$VERSION" ]] &&
    message  "${PROBLEM_COLOR}$1 is not installed${DEFAULT_COLOR}" &&
    return
 
@@ -42,10 +42,10 @@ find_module_size() {
    module_size $1 $VERSION && return
 
    # no :( lets dig through logs
-   [ -e "$INSTALL_LOGS/$1-$VERSION" ]  &&
+   [[ -e "$INSTALL_LOGS/$1-$VERSION" ]]  &&
    while read LINE
    do
-      [ -f "$LINE" ]            &&
+      [[ -f "$LINE" ]]            &&
       SIZE0=`du "$LINE"         | 
              cut -f 1-1`        &&
       SIZE=$((SIZE0+SIZE))

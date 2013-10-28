@@ -18,7 +18,7 @@ lget_lock() {
 
 lget_locked() {
 	debug_msg "lget_locked ($@)"
-	if [ -f "/var/lock/lgetting.$MODULE" ] &&
+	if [[ -f "/var/lock/lgetting.$MODULE" ]] &&
 			ps `< "/var/lock/lgetting.$MODULE"` | grep	-q	"lget" ; then
 		true
 	else
@@ -67,8 +67,8 @@ download_module() {
 		eval URLS=\${$(echo SOURCE${N}_URL | sed s/SOURCE0/SOURCE/ )[@]}
 
 		# continue (to next) if empty once, break if empty twice
-		if [ -z "$SRC" ] ; then
-			if [ -z "$SECOND" ] ; then
+		if [[ -z "$SRC" ]] ; then
+			if [[ -z "$SECOND" ]] ; then
 				SECOND="yes"
 				continue
 			else
@@ -77,20 +77,20 @@ download_module() {
 		fi
 
 		# silly that this exists:
-		if [ "$CLEAR_CACHE" == "on" ] ; then
+		if [[ "$CLEAR_CACHE" == "on" ]] ; then
 			verbose_msg "clearing source cache copy of \"$SRC\""
 			rm -f $SOURCE_CACHE/$SRC 2>/dev/null
 		fi
 
 		add_url() {
-			if [ -n "$1" ]; then
+			if [[ -n "$1" ]]; then
 				if ! echo " $ALL_URLS " | grep -q " $1 "; then
 					ALL_URLS="$ALL_URLS $1"
 				fi
 			fi
 		}
 
-		if ! plugin_call SOURCE_NEEDREFRESH ${URLS[0]} $SRC $SOURCE_CACHE && [ -f $SOURCE_CACHE/$SRC ] ; then
+		if ! plugin_call SOURCE_NEEDREFRESH ${URLS[0]} $SRC $SOURCE_CACHE && [[ -f "$SOURCE_CACHE/$SRC" ]] ; then
 			# break out of the loop if the cache has it:
 			verbose_msg "Skipping download of \"$SRC\" (in cache)"
 			continue
@@ -102,7 +102,7 @@ download_module() {
 			"${MESSAGE_COLOR}for module" \
 			"${MODULE_COLOR}${MODULE}${DEFAULT_COLOR}"
 
-		if [ -n "$BASE_URL" ] ; then
+		if [[ -n "$BASE_URL" ]] ; then
 			# in case -u was passed:
 			ALL_URLS=$BASE_URL
 		else
@@ -113,14 +113,14 @@ download_module() {
 				add_url $URL
 			done
 			for URL in $URLS ; do
-				if [ "$EXHAUSTIVE" != "on" ]; then
+				if [[ "$EXHAUSTIVE" != "on" ]]; then
 					continue
 				fi
 
 				# scan for hits against known clusters of mirrors
 				for MLIST in $MIRRORS/*; do
 					for ALT in $(sed 's/.*\t\([^\t]*\)$/\1/g;/^Custom$/d' "$MLIST"); do
-						if [ "${URL:0:${#ALT}}" == "$ALT" ] ; then
+						if [[ "${URL:0:${#ALT}}" == "$ALT" ]] ; then
 							# compose the list of valid mirrors
 							REST=${URL:${#ALT}}
 							for HIT in $(sed 's/.*\t\([^\t]*\)$/\1/g;/^Custom$/d' "$MLIST"); do
@@ -141,7 +141,7 @@ download_module() {
 				break
 			fi
 		done
-		if [ ${SUCCESS:-0} == 0 ] ; then
+		if [[ "${SUCCESS:-0}" == 0 ]] ; then
 			FAILALL=1
 			error_message "${PROBLEM_COLOR}I don't know how to download ${QUERY_COLOR}\"$1\".${DEFAULT_COLOR}"
 			error_message "${MESSAGE_COLOR}Install the package that provides the method and plugin to download it.${DEFAULT_COLOR}"
@@ -157,12 +157,12 @@ download_module() {
 testpack () {
 	local FILENAME
 	debug_msg "testpack ($@)"
-	if [ -f "$1" ]; then
+	if [[ -f "$1" ]]; then
 		FILENAME=$1
 	else
 		FILENAME=$SOURCE_CACHE/$1
 	fi
-	if [ -f "$FILENAME" ] ; then
+	if [[ -f "$FILENAME" ]] ; then
 		FILEMAGIC=$(file -b $FILENAME)
 		case $FILENAME in
 			*.bz2|*.BZ2)
@@ -203,12 +203,12 @@ show_downloading()
 	local DOWNLOAD_PID DOWNLOAD_LOG
 	debug_msg "show_downloading ($@)"
 	DOWNLOAD_PID=$(grep "^$MODULE:" "$TEMP_DOWNLOAD_PIDS" | cut -d: -f2)
-	if [ -n "$DOWNLOAD_PID" ]; then
+	if [[ -n "$DOWNLOAD_PID" ]]; then
 		DOWNLOAD_LOG=$(grep "^$MODULE:" "$TEMP_DOWNLOAD_PIDS" | cut -d: -f3)
-		if [ ! -d "/proc/$DOWNLOAD_PID" -a -f "$DOWNLOAD_LOG" ]; then
+		if [[ ! -d "/proc/$DOWNLOAD_PID" && -f "$DOWNLOAD_LOG" ]]; then
 			sed -e 's/^.*\r//' "$DOWNLOAD_LOG"
 			rm -f $DOWNLOAD_LOG
-		elif [ -f "$DOWNLOAD_LOG" ]; then
+		elif [[ -f "$DOWNLOAD_LOG" ]]; then
 			tail -s 0.1 -n 200 --follow=name --pid=$DOWNLOAD_PID "$DOWNLOAD_LOG"
 			sleep 1
 			rm -f $DOWNLOAD_LOG

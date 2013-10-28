@@ -37,7 +37,7 @@ some common criteria. Better do not hack by yourself."
 
  unset SDM
  for LUNAR in $LUNAR_MODULES ; do
-    [ "$LUNAR" == "$LUNAR_MODULE" ] && ONOFF="on" || ONOFF="off"
+    [[ "$LUNAR" == "$LUNAR_MODULE" ]] && ONOFF="on" || ONOFF="off"
     SDM=$SDM"$LUNAR:module:$ONOFF:"
  done
 

@@ -23,7 +23,7 @@ display_update_log() {
   debug_msg "display_update_log ($@)"
   rm -f /var/log/lunar/update 
   { 
-    if [ -e "$TMP_LIN_SUCCESS" -a -e "$TMP_LIN_FAIL" ] ; then 
+    if [[ -e "$TMP_LIN_SUCCESS" && -e "$TMP_LIN_FAIL" ]] ; then
       display_success_info $1
     fi
   } | tee /var/log/lunar/update 
@@ -46,13 +46,13 @@ display_success_info() {
   message  "Failed      : $NUMFAILURES"  
   message  
   
-  if  [  "$NUMSUCCESS" -gt "0"  ]; then   
+  if  [[  "$NUMSUCCESS" -gt "0"  ]]; then
     message  "${MESSAGE_COLOR}Successfully updated modules:${DEFAULT_COLOR}"  
     cat "$TMP_LIN_SUCCESS" 
     message  
   fi  
  
-  if  [  "$NUMFAILURES" -gt "0"  ]; then    
+  if  [[  "$NUMFAILURES" -gt "0"  ]]; then
     message  "${MESSAGE_COLOR}Failed updated modules:${DEFAULT_COLOR}"
     cat "$TMP_LIN_FAIL"
     message   
@@ -67,7 +67,7 @@ display_moonbase_changes()  {
   local MODULE_CHANGES NEW_MODULES DEL_MODULES MOV_MODULES M
   debug_msg "display_moonbase_changes ($@)"
 
-  if [ -e "$MODULE_INDEX" ] && [ -e "$TMP_MODULE_INDEX" ]; then
+  if [[ -e "$MODULE_INDEX" && -e "$TMP_MODULE_INDEX" ]]; then
     MODULE_CHANGES=$(temp_create "module-changes")
     diff -U0 $TMP_MODULE_INDEX $MODULE_INDEX | grep -v -e '^@@' -e '^---' -e '^+++' > $MODULE_CHANGES
 
@@ -75,10 +75,10 @@ display_moonbase_changes()  {
 	for M in $MODULES; do
 	  IN=$(grep "^-$M:" "$MODULE_CHANGES")
 	  OUT=$(grep "^+$M:" "$MODULE_CHANGES")
-	  if [ -z "$IN" -a -n "$OUT" ] ; then
+	  if [[ -z "$IN" && -n "$OUT" ]] ; then
 	    # new module:
 		NEW_MODULES="$NEW_MODULES $M"
-	  elif [ -n "$IN" -a -z "$OUT" ] ; then
+	  elif [[ -n "$IN" && -z "$OUT" ]] ; then
 	    # removed module:
 		DEL_MODULES="$DEL_MODULES $M"
 	  else
@@ -87,7 +87,7 @@ display_moonbase_changes()  {
 	  fi
 	done
 
-    if [ -n "$NEW_MODULES" ]; then
+    if [[ -n "$NEW_MODULES" ]]; then
       message "${MESSAGE_COLOR}New modules:${DEFAULT_COLOR}"
 	  for M in $NEW_MODULES; do
 	   message "  $M"
@@ -95,7 +95,7 @@ display_moonbase_changes()  {
       message
     fi
 
-    if [ -n "$DEL_MODULES" ]; then
+    if [[ -n "$DEL_MODULES" ]]; then
       message "${MESSAGE_COLOR}Removed modules:${DEFAULT_COLOR}"
 	  for M in $DEL_MODULES; do
 	    message "  $M"
@@ -103,7 +103,7 @@ display_moonbase_changes()  {
       message
     fi
 
-    if [ -n "$MOV_MODULES" ]; then
+    if [[ -n "$MOV_MODULES" ]]; then
       message "${MESSAGE_COLOR}Moved modules:${DEFAULT_COLOR}"
 	  for M in $MOV_MODULES; do
 	    INS=$(grep "^[-]$M:" "$MODULE_CHANGES" | cut -d: -f2)

@@ -24,19 +24,19 @@ backup_mods_krnl() {
 
   devoke_installwatch
 
-  if [ -f /boot/vmlinuz-$1-$ARCH ]; then
+  if [[ -f "/boot/vmlinuz-$1-$ARCH" ]]; then
     verbose_msg "copying vmlinuz-$1.$ARCH"
     cp -p /boot/vmlinuz-$1-$ARCH{,.old}
   fi
-  if [ -d /lib/modules/$1 ]; then
+  if [[ -d "/lib/modules/$1" ]]; then
     rm -rf /lib/modules/$1.old
     cp -a /lib/modules/$1{,.old}
   fi
-  if [ -f /boot/config-${1}-$ARCH.gz ]; then
+  if [[ -f "/boot/config-${1}-$ARCH.gz" ]]; then
     verbose_msg "copying config-$1.$ARCH.gz"
     cp -p /boot/config-${1}-$ARCH{,.old}.gz
   fi
-  if [ -f /boot/System.map-${1}-$ARCH ]; then
+  if [[ -f "/boot/System.map-${1}-$ARCH" ]]; then
     verbose_msg "copying System.map-$1-$ARCH"
     cp -p /boot/System.map-${1}-$ARCH{,.old}
   fi
@@ -55,17 +55,17 @@ update_bootloader() {
 # purpose: Verify that a readable kernel config is available
 # returns: Config file path, (0) if successful, (1) if config not found
 kernel_config_exists() {
-    if [ -e /proc/config.gz ]; then
+    if [[ -e /proc/config.gz ]]; then
         echo "/proc/config.gz"
-    elif [ -e /lib/modules/$(uname -r)/source/.config ]; then
+    elif [[ -e "/lib/modules/$(uname -r)/source/.config" ]]; then
         echo "/lib/modules/$(uname -r)/source/.config"
-    elif [ -e /boot/config-$(uname -r)-$(arch).gz ]; then
+    elif [[ -e "/boot/config-$(uname -r)-$(arch).gz" ]]; then
         echo "/boot/config-$(uname -r)-$(arch).gz"
-    elif [ -e /usr/src/linux/.config ]; then
+    elif [[ -e /usr/src/linux/.config ]]; then
         echo "/usr/src/linux/.config"
-    elif [ -e $CONFIG_CACHE/.config.current ]; then
+    elif [[ -e "$CONFIG_CACHE/.config.current" ]]; then
         echo "$CONFIG_CACHE/.config.current"
-    elif [ -e $CONFIG_CACHE/.config.2.6.stable ]; then
+    elif [[ -e "$CONFIG_CACHE/.config.2.6.stable" ]]; then
         echo "$CONFIG_CACHE/.config.2.6.stable"
     else
         return 1
@@ -92,7 +92,7 @@ kernel_option_present() {
             ;;
     esac
 
-    if [ -n "$KERNEL_VALUE" ]; then
+    if [[ -n "$KERNEL_VALUE" ]]; then
       if $CAT "$KERNEL_CONFIG" | grep -Eq "^$KERNEL_OPTION=\"$KERNEL_VALUE\""; then
         return 0
       fi

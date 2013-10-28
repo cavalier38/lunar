@@ -30,7 +30,7 @@ set_default_moonbase() {
   MOONBASE_TYPE=${MOONBASE_TYPE:-stable}
   unset SDM
   for MOONBASE in $MOONBASE_TYPES; do
-    [ "$MOONBASE" == "$MOONBASE_TYPE" ] && ONOFF="on" || ONOFF="off"
+    [[ "$MOONBASE" == "$MOONBASE_TYPE" ]] && ONOFF="on" || ONOFF="off"
     SDM=$SDM"$MOONBASE:type:$ONOFF:"
   done
 

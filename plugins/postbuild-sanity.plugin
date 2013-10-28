@@ -14,7 +14,7 @@
 plugin_sanity_post_build()
 {
     # Don't check the Filesystem Hierarchy Standard
-    if [ "$1" == fhs ] ; then
+    if [[ "$1" == fhs ]] ; then
         return 2;
     fi
 
@@ -42,7 +42,7 @@ plugin_sanity_post_build()
 		PATTERN=$(echo $TEST | cut -d: -f1)
 
 		parse_iw | grep -q $PATTERN
-		if [ $? == 0 ]; then
+		if [[ $? == 0 ]]; then
 			SEVERITY=$(echo $TEST | cut -d: -f2)
 			REASON=$(echo $TEST | cut -d: -f3)
 
@@ -57,7 +57,7 @@ plugin_sanity_post_build()
 				parse_iw | sort -u | grep $PATTERN
 				export SILENT=""
 				query "Ignore this warning" "y"
-				if [ $? != 0 ]; then
+				if [[ $? != 0 ]]; then
 					return 1
 				fi
 				continue

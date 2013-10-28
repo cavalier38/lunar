@@ -6,7 +6,7 @@
 # separate xterm if possible.                              #
 ############################################################
 process_parameters()  {
-  while  [  -n  "$1"  ];  do
+  while  [[  -n  "$1"  ]];  do
     if  echo  "" $1  |  grep  -q  "^ -";  then
       case  $1  in
                   --from)  export  SOURCE_CACHE="$2";       shift  2  ;;
@@ -24,7 +24,7 @@ process_parameters()  {
   done
 }
 strip_parameters()  {
-  while  [  -n  "$1"  ];  do
+  while  [[  -n  "$1"  ]];  do
     if  echo  "" $1  |  grep  -q  "^ -";  then
       case  $1  in
         --from)  shift 2  ;;
@@ -38,13 +38,13 @@ strip_parameters()  {
 process_parameters        $*
 MODULES=`strip_parameters  $*`
 
-if  [  -z  "$*"     ]   ||
-    [  -n  "$HELP"  ];  then
+if  [[  -z  "$*"     ]]   ||
+    [[  -n  "$HELP"  ]];  then
   lin;  exit  1
 fi
 
-if  [  -n  "$DISPLAY"  ];  then
-  if  [  -z  "$NO_LVU"  ];  then
+if  [[  -n  "$DISPLAY"  ]];  then
+  if  [[  -z  "$NO_LVU"  ]];  then
     xterm  -bg  black                       \
            -fg  white                       \
            $XTERM_OPTIONS                   \
@@ -52,7 +52,7 @@ if  [  -n  "$DISPLAY"  ];  then
            -e   /bin/sh  -c  "lvu  voyeur  5  $MODULES"  &
   fi
 
-  if  [  -z  "$NO_lget"  ];  then
+  if  [[  -z  "$NO_lget"  ]];  then
     xterm  -bg  black             \
            -fg  white             \
            $XTERM_OPTIONS         \

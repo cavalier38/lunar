@@ -13,7 +13,7 @@
 
 push_uniq_id() {
   debug_msg "push_uniq_id ($@)"
-  if [ -z "$UNIQID" ]; then
+  if [[ -z "$UNIQID" ]]; then
     create_uniq_id
   fi
  
@@ -26,7 +26,7 @@ push_uniq_id() {
 create_uniq_id() {
   local OS HASH IFACE
   debug_msg "create_uniq_id ($@)"
-  if [ -n "$UNIQID" ]; then 
+  if [[ -n "$UNIQID" ]]; then
     return
   fi
 

@@ -20,7 +20,7 @@ patch_it () {
   verbose_msg "patch_it \"$1\" \"$2\"";
 
   # get patch from $SOURCE_CACHE automatically
-  if [ ! -f "$1" -a -f "$SOURCE_CACHE/$1" ] ; then
+  if [[ ! -f "$1" && -f "$SOURCE_CACHE/$1" ]] ; then
     PATCH="$SOURCE_CACHE/$1"
   else
     PATCH="$1"

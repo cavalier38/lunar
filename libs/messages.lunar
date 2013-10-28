@@ -74,7 +74,7 @@ debug_msg() {
     fi
     if [[ "$LUNAR_DEBUG" -ge "5" ]] ; then
       echo "++ $@" >> $TMPDIR/lp_debuglog.$$
-      if [ -f $TMPDIR/l_debug_var.$$ ] ; then
+      if [[ -f "$TMPDIR/l_debug_var.$$" ]] ; then
         mv $TMPDIR/l_debug_var.$$ $TMPDIR/l_debug_var.$$.old
       else
         return
@@ -105,18 +105,18 @@ xterm_msg() {
 report() {
   local TMP_MAIL
   debug_msg "report ($@)"
-  if [ ! -f "$1" ] ; then
+  if [[ ! -f "$1" ]] ; then
     return
   fi
 
-  if [ "$VIEW_REPORTS" == "on" ] ; then
+  if [[ "$VIEW_REPORTS" == "on" ]] ; then
     sound REPORT
     if query "View $2 for ${MODULE_COLOR}${3}-${VERSION_COLOR}${4}${DEFAULT_COLOR}${QUERY_COLOR} ?" n ; then
       view_file "$1"
     fi
   fi
 
-  if [ "$MAIL_REPORTS" == "on" ] ; then
+  if [[ "$MAIL_REPORTS" == "on" ]] ; then
     TMP_MAIL=$(temp_create "mailreport")
     date -u > $TMP_MAIL
     echo >> $TMP_MAIL
@@ -136,15 +136,15 @@ query() {
   # 2 arguments
   # query "what do you want?  "  DEFAULT
 
-  if [ -z "$SILENT" ]; then
+  if [[ -z "$SILENT" ]]; then
     unset RESPONSE
-    while [ -z "$RESPONSE" ]; do
-      if [ -n "$MODULE" ]; then
+    while [[ -z "$RESPONSE" ]]; do
+      if [[ -n "$MODULE" ]]; then
         echo -e -n "${MODULE_COLOR}${MODULE}${DEFAULT_COLOR}: "
       fi
       echo -e -n "${QUERY_COLOR}$1 [$2] ${DEFAULT_COLOR}"
       read -t $PROMPT_DELAY -n 1 RESPONSE
-      if [ -z "$RESPONSE" ]; then
+      if [[ -z "$RESPONSE" ]]; then
         RESPONSE=${RESPONSE:-$2}
       else
         echo
@@ -173,8 +173,8 @@ query() {
 mquery()
 {
     debug_msg "mquery ($@)"
-    if [ -n "$MODULE" ]; then
-        if [ -z "$(get_module_config $1)" ]; then
+    if [[ -n "$MODULE" ]]; then
+        if [[ -z "$(get_module_config $1)" ]]; then
             # it's not set yet... start the asking loop
             if query "$2" "$3" ; then
                 set_module_config "$1" y
@@ -183,7 +183,7 @@ mquery()
             fi
         fi
         # and lookup the result in case of yes/no opts
-        if [ $(get_module_config $1) == "y" ] ; then
+        if [[ $(get_module_config $1) == "y" ]] ; then
             OPTS="$OPTS $4"
         else
             OPTS="$OPTS $5"
@@ -217,8 +217,8 @@ color()  {
 sound()
 {
   debug_msg "sound ($@)"
-  if [ "$SOUND" == "on" ]; then
-    if [ -f "$SOUND_DIRECTORY/$SOUND_THEME/$1" ]; then
+  if [[ "$SOUND" == "on" ]]; then
+    if [[ -f "$SOUND_DIRECTORY/$SOUND_THEME/$1" ]]; then
 	  ( cd / ; play "$SOUND_DIRECTORY/$SOUND_THEME/$1" > /dev/null 2>&1 & )
 	fi
   fi

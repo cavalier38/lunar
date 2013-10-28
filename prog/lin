@@ -71,21 +71,21 @@ main() {
     fi
     # remove moonbase from MODULES and continue
     MODULES=$(echo $MODULES | sed 's/moonbase//g')
-    if [ -z "$MODULES" ] ; then
+    if [[ -z "$MODULES" ]] ; then
       return
     fi
   fi
 
-  if [ -z "$MODULES" ] ; then
+  if [[ -z "$MODULES" ]] ; then
     message "${MESSAGE_COLOR}Nothing to do!${DEFAULT_COLOR}"
     return
   fi
 
   # different approaches for multiple modules (start up downloads first)
   # and single modules (plain install)
-  if [ -z "$SINGLE_MODULE" ] ; then
+  if [[ -z "$SINGLE_MODULE" ]] ; then
 
-    if [ -z "$TEMP_DOWNLOAD_PIDS" ] ; then
+    if [[ -z "$TEMP_DOWNLOAD_PIDS" ]] ; then
       export TEMP_DOWNLOAD_PIDS=$(temp_create "download-pids")
       export TEMP_PREPAREDDEPS=$(temp_create "prepared-depends")
     fi
@@ -103,7 +103,7 @@ main() {
 
     # pass 2 : hit the download manager button and grab a beer
     # this runs as a background process, so we are off to step #3 right away
-    if [ -z "$DEPS_ONLY" ] ; then
+    if [[ -z "$DEPS_ONLY" ]] ; then
       verbose_msg "Spawning download manager"
 
       # this code hurts more than it helps - it can stall forever (minutes)
@@ -132,7 +132,7 @@ main() {
       # pass 3 : compile/install
       # no strange stuff should happen here anymore
       for MODULE in $MODULES ; do
-        if ! module_installed $MODULE || [ ! -n "$PROBE" ] || ( [ -n "$PROBE" ] && [ "$PROBE_EXPIRED" == "on" ] && module_is_expired $MODULE ) ; then
+        if ! module_installed $MODULE || [[ ! -n "$PROBE" ]] || { [[ -n "$PROBE" && "$PROBE_EXPIRED" == "on" ]] && module_is_expired $MODULE ; } ; then
           # 3 more conditions to stop processing this module:
           if module_held $MODULE ; then
             error_message "${LRM_COLOR}Notice:${DEFAULT_COLOR}${MESSAGE_COLOR} Skipping compile and install for held module ${MODULE_COLOR}$MODULE${DEFAULT_COLOR}"
@@ -151,12 +151,12 @@ main() {
             linING="/var/lock/installing.$MODULE"
             verbose_msg "starting lin \"$MODULE\""
             if ! ( SINGLE_MODULE=1 main $MODULE ) ; then
-              if [ -e "$TMP_LIN_FAIL" ] ; then
+              if [[ -e "$TMP_LIN_FAIL" ]] ; then
                 echo "$MODULE" >> $TMP_LIN_FAIL
               fi
               lin_EXIT_STATUS=1;
             else
-              if [ -e "$TMP_LIN_SUCCESS" ] ; then
+              if [[ -e "$TMP_LIN_SUCCESS" ]] ; then
                 echo "$MODULE" >> $TMP_LIN_SUCCESS
               fi
             fi
@@ -177,7 +177,7 @@ main() {
     MODULE=$MODULES
     unset RECONFIGURE
 
-    if [ -z "$TEMP_DOWNLOAD_PIDS" ] ; then
+    if [[ -z "$TEMP_DOWNLOAD_PIDS" ]] ; then
       export TEMP_DOWNLOAD_PIDS=$(temp_create "download-pids")
       export TEMP_PREPAREDDEPS=$(temp_create "prepared-depends")
       export TEMP_CONFIGOPTS=$(temp_create "configopts")
@@ -188,25 +188,25 @@ main() {
     run_depends $MODULE &&
     WANT_VERSION= satisfy_depends $MODULE
 
-    if [ -z "$DEPS_ONLY" ] ; then
+    if [[ -z "$DEPS_ONLY" ]] ; then
       if ! module_held $MODULE ; then
-        if [ -n "$PROBE" ] ; then
+        if [[ -n "$PROBE" ]] ; then
           # --probe install
           if ! module_installed $MODULE ; then
             if ! lin_module $MODULE ; then
               temp_destroy $TEMP_PREPAREDDEPS
-	      if [ -n "$CLEAN_TEMP" ] ; then
+	      if [[ -n "$CLEAN_TEMP" ]] ; then
 	        temp_destroy $TEMP_DOWNLOAD_PIDS
 	        temp_destroy $TEMP_CONFIGOPTS
 	      fi
               exit 1
             fi
-          elif [ "$PROBE_EXPIRED" == "on" ] && module_is_expired $MODULE ; then
+          elif [[ "$PROBE_EXPIRED" == "on" ]] && module_is_expired $MODULE ; then
             # probe install where module is expired
             verbose_msg "module \"$MODULE\" needs to be updated"
             if ! SINGLE_MODULE= lin_module $MODULE ; then
               temp_destroy $TEMP_PREPAREDDEPS
-	      if [ -n "$CLEAN_TEMP" ] ; then
+	      if [[ -n "$CLEAN_TEMP" ]] ; then
 		temp_destroy $TEMP_DOWNLOAD_PIDS
 		temp_destroy $TEMP_CONFIGOPTS
 	      fi
@@ -217,7 +217,7 @@ main() {
           # normal install - not probed
           if ! lin_module $MODULE ; then
             temp_destroy $TEMP_PREPAREDDEPS
-	    if [ -n "$CLEAN_TEMP" ] ; then
+	    if [[ -n "$CLEAN_TEMP" ]] ; then
 	      temp_destroy $TEMP_DOWNLOAD_PIDS
 	      temp_destroy $TEMP_CONFIGOPTS
 	    fi
@@ -228,7 +228,7 @@ main() {
         verbose_msg "Skipping held module \"$MODULE\""
       fi
     fi
-    if [ -n "$CLEAN_TEMP" ] ; then
+    if [[ -n "$CLEAN_TEMP" ]] ; then
       temp_destroy $TEMP_DOWNLOAD_PIDS
       temp_destroy $TEMP_PREPAREDDEPS
       temp_destroy $TEMP_CONFIGOPTS
@@ -246,7 +246,7 @@ GETOPT_ARGS=$(getopt -q -n lin -o "cdgf:hprRsvV:w:" -l "compile,debug,deps,downl
 # happens:
 trap "rm -f $(eval echo \$TEMP_PREPAREDDEPS \$TEMP_DOWNLOAD_PIDS \$INSTALLWATCHFILE) ; exit 1" CHLD INT TERM KILL
 
-if [ -z "$?" ] ; then
+if [[ -z "$?" ]] ; then
   help | view_file
   exit
 else
@@ -277,7 +277,7 @@ else
     esac
   done
 
-  if [ -n "$RESURRECT" ] ; then
+  if [[ -n "$RESURRECT" ]] ; then
     resurrect_modules $@
   else
     main $@

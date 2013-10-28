@@ -12,7 +12,7 @@
 
 plugin_source_download_file()  {
   # check if we can handle this type of URL:
-  if [ ${1:0:7} != "file://" ]; then
+  if [[ "${1:0:7}" != "file://" ]]; then
     return 2
   fi
   debug_msg "plugin_source_download_file ($@)"

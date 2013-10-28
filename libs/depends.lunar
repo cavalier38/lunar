@@ -53,7 +53,7 @@ function find_depends() {
       }
 
       DEPFILE=$MOONBASE/$SECTION/$1/DEPENDS
-      if [ -e $DEPFILE ] ; then
+      if [[ -e $DEPFILE ]] ; then
         DEPS=$(MODULE=$1 . $DEPFILE)
       fi
     else
@@ -141,7 +141,7 @@ remove_depends() {
   lock_file $DEPENDS_STATUS        ||
   return 1
 
-  if [ -n "$2" ] ; then
+  if [[ -n "$2" ]] ; then
     if grep -q "^$1:$2:" "$DEPENDS_STATUS" ; then
       grep -v "^$1:$2:" $DEPENDS_STATUS_BACKUP > $DEPENDS_STATUS
       verbose_msg "removing depends for \"$1\" on \"$2\""
@@ -249,7 +249,7 @@ run_depends() {
           fi
           lin --deps $DEP
           echo "$DEP" >> $TEMP_PREPAREDDEPS
-        elif module_installed $DEP && [ -z "$2" -a -z "$3" ] ; then
+        elif module_installed $DEP && [[ -z "$2" && -z "$3" ]] ; then
           verbose_msg "Auto-adding optional dependency \"$DEP\""
           add_depends  "$MODULE"  "$DEP"  "on"   "optional"  "$2"  "$3"
           # don't check depends if there are already checked
@@ -276,7 +276,7 @@ run_depends() {
 
   grep -q "^"$MODULE"\$" "$TEMP_PREPAREDDEPS" 2>/dev/null && return 0
   if has_module_file $MODULE DEPENDS ; then
-    if [ -n "$SINGLE_MODULE" ] ; then
+    if [[ -n "$SINGLE_MODULE" ]] ; then
       # we only need to show this once, but we get here twice per module
       message  "${CHECK_COLOR}Checking dependencies for"  \
                "${MODULE_COLOR}${MODULE}"                 \
@@ -295,14 +295,14 @@ run_depends() {
 satisfy_depends()  {
   local TMP_FILE DEP_MODULE DEP_STATUS DEP_ON DEP_OFF LINE
   debug_msg "satisfy_depends ($@)"
-  if [ -n "$DEPS_ONLY" ] ; then 
+  if [[ -n "$DEPS_ONLY" ]] ; then
     return 0
   fi
   
   # make sure we start with clean OPTS here:
   unset OPTS
 
-  if [ -s "$MODULE_CONFIG" ] ; then
+  if [[ -s "$MODULE_CONFIG" ]] ; then
     . $MODULE_CONFIG
   fi
 
@@ -311,7 +311,7 @@ satisfy_depends()  {
 
   # first recursively check if all required dependencies are installed
   for DEP_MODULE in $(find_depends $MODULE | grep -v '%') ; do
-    if [ $DEP_MODULE != $MODULE ]; then
+    if [[ $DEP_MODULE != $MODULE ]]; then
       if ! module_installed $DEP_MODULE ; then
         if module_exiled $DEP_MODULE ; then
           message "${MODULE_COLOR}${MODULE}:${PROBLEM_COLOR} ! Error: required dependency ${MODULE_COLOR}$DEP_MODULE${DEFAULT_COLOR}${PROBLEM_COLOR} is exiled and cannot be installed${DEFAULT_COLOR}"
@@ -330,13 +330,13 @@ satisfy_depends()  {
         DEP_ON=$(echo $LINE | cut -d: -f5)
        DEP_OFF=$(echo $LINE | cut -d: -f6)
 
-    if [ -n "$FIX" ] ; then
-      if [ $DEP_STATUS == "on" ] ; then
+    if [[ -n "$FIX" ]] ; then
+      if [[ "$DEP_STATUS" == "on" ]] ; then
         lin $FIX $DEP_MODULE
       fi
-    elif [ "$DEP_STATUS" == "off" ] || module_exiled $DEP_MODULE ; then
+    elif [[ "$DEP_STATUS" == "off" ]] || module_exiled $DEP_MODULE ; then
       OPTS="$OPTS $DEP_OFF"
-    elif [ "$DEP_STATUS" == "on" ] && ! module_installed $DEP_MODULE ; then
+    elif [[ "$DEP_STATUS" == "on" ]] && ! module_installed $DEP_MODULE ; then
       if SINGLE_MODULE=1 lin $DOWNLOAD_ONLY $SILENT $COMPILE $DEP_MODULE ; then
         OPTS="$OPTS $DEP_ON"
       else
@@ -380,7 +380,7 @@ run_conflicts() {
 
 build_module_depends() {
   debug_msg "build_module_depends ($@)"
-  if [ -n "$DEPS_ONLY" ] ; then
+  if [[ -n "$DEPS_ONLY" ]] ; then
    (
     if ! run_conflicts $1 ; then
       exit 1
@@ -403,7 +403,7 @@ build_module_depends() {
 build_depends()  {
   debug_msg "build_depends ($@)"
   for MODULE in $@ ; do
-    if ! module_installed $MODULE || [ ! -n "$PROBE" ] ; then
+    if ! module_installed $MODULE || [[ ! -n "$PROBE" ]] ; then
       if ! module_held $MODULE ; then
         build_module_depends $MODULE
       else
@@ -419,11 +419,11 @@ create_depends_cache()
   local TMP_DEP_CACHE DEPFILES DEPFILE MODULE
   debug_msg "create_depends_cache($@)"
 
-  if [ ! -w $DEPENDS_CACHE -a -e $DEPENDS_CACHE ] ; then
+  if [[ ! -w "$DEPENDS_CACHE" && -e "$DEPENDS_CACHE" ]] ; then
     return 1
   fi
 
-  if [ $MODULE_INDEX -nt $DEPENDS_CACHE ] ; then
+  if [[ $MODULE_INDEX -nt $DEPENDS_CACHE ]] ; then
     verbose_msg "Generating a new depends cache..."
     TMP_DEP_CACHE=$(temp_create "depends.cache")
 
@@ -444,14 +444,14 @@ create_depends_cache()
     }
 
     # speedups for system moonbases:
-    if [ "$MOONBASE" == "/var/lib/lunar/moonbase" ] && [ -f "$INSTALL_LOGS/moonbase-$(installed_version moonbase)" ] ; then
+    if [[ "$MOONBASE" == "/var/lib/lunar/moonbase" ]] && [[ -f "$INSTALL_LOGS/moonbase-$(installed_version moonbase)" ]] ; then
       DEPFILES=$(grep "/DEPENDS$" "$INSTALL_LOGS/moonbase-$(installed_version moonbase)")
       # don't forget zlocal:
-      if [ "$ZLOCAL_OVERRIDES" == "on" ] ; then
+      if [[ "$ZLOCAL_OVERRIDES" == "on" ]] ; then
         DEPFILES="$DEPFILES $(find $MOONBASE/zlocal -type f -name DEPENDS)"
       fi
     else
-      if [ "$ZLOCAL_OVERRIDES" != "on" ] ; then
+      if [[ "$ZLOCAL_OVERRIDES" != "on" ]] ; then
         DEPFILES=$(find $MOONBASE -type f -name DEPENDS ! -regex "$MOONBASE/zlocal/.*")
       else
         DEPFILES=$(find $MOONBASE -type f -name DEPENDS)
